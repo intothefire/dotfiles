@@ -1,0 +1,33 @@
+mkdir -p "$HOME/.jetbrains"
+
+# Prepend new items to path (if directory exists)
+ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
+
+prepend-path "$HOME/.jetbrains"
+prepend-path "/bin"
+prepend-path "/usr/bin"
+prepend-path "/usr/local/bin"
+prepend-path "/usr/local/opt/coreutils/libexec/gnubin"
+prepend-path "/usr/local/opt/ruby/bin"
+prepend-path "$DOTFILES_DIR/bin"
+prepend-path "$HOME/bin"
+prepend-path "/sbin"
+prepend-path "/usr/sbin"
+prepend-path "/usr/local/sbin"
+
+prepend-path "$ANDROID_SDK_ROOT/emulator"
+prepend-path "$ANDROID_SDK_ROOT/tools"
+prepend-path "$ANDROID_SDK_ROOT/tools/bin"
+prepend-path "$ANDROID_SDK_ROOT/platform-tools"
+
+prepend-path "/usr/local/opt/python@3.8/bin"
+prepend-path "/Users/cnorman/Library/Python/2.7/bin"
+
+# Remove duplicates (preserving prepended items)
+# Source: http://unix.stackexchange.com/a/40755
+
+PATH=$(echo -n $PATH | awk -v RS=: '{ if (!arr[$0]++) {printf("%s%s",!ln++?"":":",$0)}}')
+
+# Wrap up
+
+export PATH

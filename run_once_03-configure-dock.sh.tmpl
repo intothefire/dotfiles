@@ -1,0 +1,39 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/zsh
+
+dockutil --no-restart --remove all
+dockutil --no-restart --add "/Applications/1Password 7.app"
+dockutil --no-restart --add "/Applications/Airmail.app"
+dockutil --no-restart --add "/System/Applications/Messages.app"
+dockutil --no-restart --add "/Applications/Slack.app"
+dockutil --no-restart --add "/Applications/Drafts.app"
+dockutil --no-restart --add "/Applications/Setapp/Ulysses.app"
+dockutil --no-restart --add "/Applications/Fantastical.app"
+dockutil --no-restart --add "/Applications/OmniFocus.app"
+dockutil --no-restart --add "/Applications/Reeder.app"
+dockutil --no-restart --add "/Applications/Pocket.app"
+dockutil --no-restart --add "/Applications/Sizzy.app"
+dockutil --no-restart --add "/Applications/Safari.app"
+dockutil --no-restart --add "/Applications/Google Chrome.app"
+dockutil --no-restart --add "/Applications/Firefox.app"
+dockutil --no-restart --add "/Applications/Microsoft Edge.app"
+dockutil --no-restart --add "/Applications/Screens 4.app"
+dockutil --no-restart --add "/Applications/iTerm.app"
+dockutil --no-restart --add "/Applications/Tower.app"
+dockutil --no-restart --add "/Applications/Xcode.app"
+dockutil --no-restart --add '/Users/cnorman/Library/Application Support/JetBrains/Toolbox/apps/RubyMine/ch-0/212.5457.52/RubyMine.app'
+dockutil --no-restart --add '/Users/cnorman/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-1/212.5457.55/WebStorm.app'
+dockutil --no-restart --add '/Users/cnorman/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/203.7784292/Android Studio.app'
+dockutil --no-restart --add "/Applications/Postman.app"
+dockutil --no-restart --add "/Applications/Flipper.app"
+dockutil --no-restart --add "/Applications/Abstract.app"
+dockutil --no-restart --add "/Applications/Sketch.app"
+dockutil --no-restart --add "/System/Applications/Music.app"
+
+dockutil --no-restart --add '' --type spacer --section apps --after Music
+
+dockutil --add '~/Downloads' --view fan --display stack --allhomes
+
+killall Dock
+
+{{ end -}}
