@@ -57,49 +57,26 @@ cask "textexpander"
 cask "tower"
 cask "vlc"
 
-# mas "Airmail", id: 918858936
-# mas "Airmail", id: 918858936
-# mas "CARROT Weather", id: 993487541
-# mas "CARROT Weather", id: 993487541
-# mas "Deliveries", id: 924726344
-# mas "Deliveries", id: 924726344
-# mas "Drafts", id: 1435957248
-# mas "Drafts", id: 1435957248
-# mas "Fantastical", id: 975937182
-# mas "Fantastical", id: 975937182
-# mas "GarageBand", id: 682658836
-# mas "GarageBand", id: 682658836
-# mas "Grammarly for Safari", id: 1462114288
-# mas "Grammarly for Safari", id: 1462114288
-# mas "HomeControl", id: 1547121417
-# mas "HomeControl", id: 1547121417
-# mas "Hush", id: 1544743900
-# mas "Hush", id: 1544743900
-# mas "iMovie", id: 408981434
-# mas "iMovie", id: 408981434
-# mas "Keynote", id: 409183694
-# mas "Keynote", id: 409183694
-# mas "Microsoft Excel", id: 462058435
-# mas "Microsoft Excel", id: 462058435
-# mas "Microsoft PowerPoint", id: 462062816
-# mas "Microsoft PowerPoint", id: 462062816
-# mas "Microsoft Word", id: 462054704
-# mas "Microsoft Word", id: 462054704
-# mas "Numbers", id: 409203825
-# mas "Numbers", id: 409203825
-# mas "OmniFocus", id: 1346203938
-# mas "OmniFocus", id: 1346203938
-# mas "Pages", id: 409201541
-# mas "Pages", id: 409201541
-# mas "PiPifier", id: 1160374471
-# mas "PiPifier", id: 1160374471
-# mas "Pocket", id: 568494494
-# mas "Pocket", id: 568494494
-# mas "Reeder", id: 1449412482
-# mas "Reeder", id: 1449412482
-# mas "Sorted", id: 1306893526
-# mas "Sorted", id: 1306893526
-# mas "Spark", id: 1176895641
-# mas "Spark", id: 1176895641
-# mas "Xcode", id: 497799835
-# mas "Xcode", id: 497799835
+mas "Airmail", id: 918858936
+mas "CARROT Weather", id: 993487541
+mas "Deliveries", id: 924726344
+mas "Drafts", id: 1435957248
+mas "Fantastical", id: 975937182
+mas "GarageBand", id: 682658836
+mas "Grammarly for Safari", id: 1462114288
+mas "HomeControl", id: 1547121417
+mas "Hush", id: 1544743900
+mas "iMovie", id: 408981434
+mas "Keynote", id: 409183694
+mas "Microsoft Excel", id: 462058435
+mas "Microsoft PowerPoint", id: 462062816
+mas "Microsoft Word", id: 462054704
+mas "Numbers", id: 409203825
+mas "OmniFocus", id: 1346203938
+mas "Pages", id: 409201541
+mas "PiPifier", id: 1160374471
+mas "Pocket", id: 568494494
+mas "Reeder", id: 1449412482
+mas "Sorted", id: 1306893526
+mas "Spark", id: 1176895641
+mas "Xcode", id: 497799835
