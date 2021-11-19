@@ -1,4 +1,8 @@
+eval $(thefuck --alias)
+
 {{ if eq .chezmoi.os "darwin" -}}
+
+
 # Copy pwd to clipboard
 
 alias cpwd="pwd|tr -d '\n'|pbcopy"
