@@ -1,5 +1,10 @@
 #!/usr/bin/env zsh
 
+sudo softwareupdate -i -a
+xcode-select --install
+
+sudo softwareupdate --install-rosetta
+
 NVM_DIR=~/.nvm
 RVM_DIR=~/.rvm
 
