@@ -9,6 +9,15 @@ tap "homebrew/cask-versions"
 tap "homebrew/core"
 tap "jondot/tap"
 
+cask "iterm2"
+cask "screens"
+cask "tower"
+cask "handbrake"
+
+# if laptop, additional stuff below
+
+{{- if (.laptop) -}}
+# adding extra items
 cask "microsoft-edge"
 cask "1password"
 cask "1password-cli"
@@ -22,15 +31,12 @@ cask 'android-sdk' # Android
 cask "audio-hijack"
 cask "caffeine"
 cask "carbon-copy-cloner"
-# cask "dropbox"
-# cask "maestral"
+cask "maestral"
 cask "elgato-control-center"
 cask "elgato-stream-deck"
 cask "firefox"
 cask "flipper"
 cask "google-chrome"
-cask "handbrake"
-cask "iterm2"
 cask "jetbrains-toolbox"
 cask "kaleidoscope"
 cask "keyboard-maestro"
@@ -41,7 +47,6 @@ cask "microsoft-auto-update"
 cask "ngrok"
 cask "obs"
 cask "postman"
-cask "screens"
 cask "scrivener"
 cask "setapp"
 cask "sketch"
@@ -49,8 +54,11 @@ cask "slack"
 cask "soundsource"
 cask "suspicious-package"
 cask "textexpander"
-cask "tower"
 cask "vlc"
+cask "luna-display"
+cask "zoom"
+cask "microsoft-teams"
+cask "cardhop"
 
 mas "Airmail", id: 918858936
 mas "CARROT Weather", id: 993487541
@@ -75,3 +83,5 @@ mas "Reeder", id: 1449412482
 mas "Sorted", id: 1306893526
 mas "Spark", id: 1176895641
 mas "Xcode", id: 497799835
+
+{{ end -}}

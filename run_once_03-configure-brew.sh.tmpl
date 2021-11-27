@@ -1,6 +1,13 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/bin/zsh
 
+if [ -f /opt/homebrew/bin/brew ]; then \eval "$(/opt/homebrew/bin/brew shellenv)"; fi
+
+brew bundle --file=~/.config/brew/Brewfile
+brew bundle --file=~/.config/brew/Caskfile
+
+
+{{- if (.laptop) -}}
 dockutil --no-restart --remove all
 dockutil --no-restart --add "/Applications/1Password 7.app"
 dockutil --no-restart --add "/Applications/Airmail.app"
@@ -32,8 +39,10 @@ dockutil --no-restart --add "/System/Applications/Music.app"
 
 dockutil --no-restart --add '' --type spacer --section apps --after Music
 
-dockutil --add '~/Downloads' --view fan --display stack --allhomes
+dockutil --no-restart --add '~/Downloads' --view fan --display stack --allhomes
 
 killall Dock
 
+
+{{ end -}}
 {{ end -}}

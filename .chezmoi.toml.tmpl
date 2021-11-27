@@ -8,12 +8,14 @@
 
 {{- $email := promptString "Git email address" }}
 {{- $computer := promptString "Computer Name" }}
+{{- $laptop := promptBool "Laptop?" }}
 {{- $name := "Chris Norman" }}
 
 [data]
   email = {{ $email | quote }}
   name = {{ $name | quote }}
   computername = {{ $computer | quote }}
+  laptop = {{ $laptop }}
 
 [edit]
     command = "rubymine"
