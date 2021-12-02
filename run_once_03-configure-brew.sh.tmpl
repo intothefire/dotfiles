@@ -6,8 +6,12 @@ if [ -f /opt/homebrew/bin/brew ]; then \eval "$(/opt/homebrew/bin/brew shellenv)
 brew bundle --file=~/.config/brew/Brewfile
 brew bundle --file=~/.config/brew/Caskfile
 
-
+echo "moving stuff in dock"
+# Blah
 {{- if (.laptop) -}}
+# echo "setting up dock touch me...."
+
+
 dockutil --no-restart --remove all
 dockutil --no-restart --add "/Applications/1Password 7.app"
 dockutil --no-restart --add "/Applications/Airmail.app"
@@ -17,9 +21,9 @@ dockutil --no-restart --add "/Applications/Drafts.app"
 dockutil --no-restart --add "/Applications/Setapp/Ulysses.app"
 dockutil --no-restart --add "/Applications/Fantastical.app"
 dockutil --no-restart --add "/Applications/OmniFocus.app"
-dockutil --no-restart --add "/Applications/Reeder.app"
+dockutil --no-restart --add "/Applications/Reeder.localized/Reeder.app"
 dockutil --no-restart --add "/Applications/Pocket.app"
-dockutil --no-restart --add "/Applications/Sizzy.app"
+dockutil --no-restart --add "/Applications/Setapp/Sizzy.app"
 dockutil --no-restart --add "/Applications/Safari.app"
 dockutil --no-restart --add "/Applications/Google Chrome.app"
 dockutil --no-restart --add "/Applications/Firefox.app"
