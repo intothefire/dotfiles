@@ -1,14 +1,14 @@
 #!/usr/bin/env zsh
 
-sudo softwareupdate -i -a
+# sudo softwareupdate -i -a
 xcode-select --install
 
-sudo softwareupdate --install-rosetta
+# sudo softwareupdate --install-rosetta
 
 NVM_DIR=~/.nvm
 RVM_DIR=~/.rvm
 
-curl -fsSL -o install.sh https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh && /bin/bash install.sh && rm -rf install.sh
+# curl -fsSL -o install.sh https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh && /bin/bash install.sh && rm -rf install.sh
 
 if ! [ -d "$RVM_DIR" ]; then \curl -L https://get.rvm.io | bash -s stable --ruby; fi
 source ${RVM_DIR}/scripts/rvm
