@@ -20,6 +20,7 @@ brew "terminal-notifier"
 
 # --- Modern CLI ---
 brew "fzf"          # fuzzy finder (Ctrl-R history, file picker)
+brew "fzf-tab"      # fuzzy, previewable TAB completion
 brew "zoxide"       # smarter cd (`z`)
 brew "eza"          # modern ls (icons + git)
 brew "bat"          # syntax-highlighted cat / pager
@@ -30,6 +31,7 @@ brew "direnv"       # per-directory env (.envrc)
 # --- Dev toolchain ---
 brew "corepack"
 brew "gh"
+brew "git-absorb"   # auto fixup commits (`git absorb`)
 brew "go"
 brew "mise"        # polyglot version manager (node; replaces nvm)
 brew "nx"
