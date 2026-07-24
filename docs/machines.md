@@ -33,14 +33,20 @@ scripts (`.role` / `.chezmoi.os`).
 `dot_ssh/authorized_keys.tmpl` provisions your GitHub public keys, so your laptop's
 1Password SSH agent can log in key-based once the box is bootstrapped.
 
-## Linux `server` — status / TODO
-The **package matrix already excludes mac-only formulae on Linux** (Brewfile.tmpl gates
-on `.chezmoi.os`). What still needs wiring + validation **on an actual Linux box**:
+## Linux `server` — what's wired
+Linux support is built and Mac-verified (Mac renders/behaviour unchanged). On a Linux box:
 
-- `run_once_01`: install Homebrew-on-Linux (or apt), add `uv` for Python, skip rvm/Ruby
-- shell fragments: Linux clipboard (`wl-copy`/`xclip`) in tmux instead of `pbcopy`; skip
-  the mac-only PATH/hooks (Kiro, Antigravity, JetBrains, `/opt/homebrew`)
-- these are `.chezmoi.os`-gated — finish and test when the server exists
+- **Packages**: `Brewfile.tmpl` excludes mac-only formulae; casks are skipped entirely.
+- **Bootstrap** (`run_once_01`): installs Homebrew-on-Linux (with `build-essential` etc.),
+  runs `brew bundle` (no Caskfile), skips Xcode/rvm, sets up node via mise + `uv` for Python.
+- **Shell**: `.zprofile`/`.zshrc` detect the brew prefix (`/home/linuxbrew` vs `/opt/homebrew`)
+  so completions/plugins resolve; gcloud is guarded; the mac-only hooks (Kiro, Antigravity,
+  JetBrains, rvm) are `[[ -f ]]`-guarded no-ops.
+- **tmux clipboard**: `pbcopy → xclip → wl-copy` fallback chain; headless SSH falls back to
+  tmux `set-clipboard` (OSC 52), which copies to *your laptop's* clipboard.
 
-Until then, `laptop` and `mac-dev` are fully supported; `server` has the right package
-set but needs the bootstrap/shell Linux pass.
+### Validate on the first real box
+- custom-tap formulae have Linux bottles? (`opencode`, `rtk`, `wt`, `gogcli` — `afm` is
+  mac-only and already gated out)
+- Homebrew-on-Linux installs cleanly (needs `sudo` for the `apt` prereqs once)
+- clipboard over SSH behaves as expected (OSC 52 vs local xclip)
