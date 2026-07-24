@@ -26,6 +26,7 @@ auth       sufficient     pam_tid.so
 PAM
 fi
 
+{{ if .laptop -}}
 ###############################################################################
 # General UI/UX                                                               #
 ###############################################################################
@@ -420,6 +421,7 @@ done
 ###############################################################################
 # defaults write com.jetbrains.apps.activator NSNavLastRootDirectory -string "~/JetBrains"
 
+{{ end -}}
 echo "Done"
 
 return 0

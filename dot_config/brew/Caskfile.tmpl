@@ -1,61 +1,66 @@
-# Homebrew casks.  Applied by run_once_01 via `brew bundle --file=~/.config/brew/Caskfile`.
-# Formulae live in ./Brewfile.  This is a chezmoi template — the Antigravity IDE is
-# gated on {{ "{{ .laptop }}" }}, so it only installs on laptops.
+{{- /* Homebrew casks (macOS only), templated by role. Applied by run_once_01. */ -}}
+{{- if eq .chezmoi.os "darwin" -}}
+{{- $laptop := eq .role "laptop" -}}
+# role = {{ .role }} — regenerated from Caskfile.tmpl.
 
-# --- Security ---
+# --- CLI tools + connectivity (laptop + mac-dev) ---
+cask "1password-cli"       # provides `op`
+cask "gcloud-cli"
+cask "kiro-cli"
+cask "antigravity-cli"
+cask "tailscale-app"       # SSH over the tailnet
+
+# --- Mobile / RN toolchain (laptop + mac-dev) ---
+cask "zulu@17"             # Java for React Native / Gradle
+{{ if $laptop }}
+# ===== GUI apps — laptop only =====
+
+# security
 cask "1password"
-cask "1password-cli"
 
-# --- AI ---
+# AI
 cask "claude"
 cask "chatgpt"
 cask "codexbar"
-cask "kiro-cli"
 
-# --- Browsers ---
+# browsers
 cask "google-chrome"
 cask "chromium"
 cask "firefox"
 
-# --- Cloud / sync ---
+# cloud / sync
 cask "dropbox"
 cask "google-drive"
-cask "gcloud-cli"
-cask "tailscale-app"
 
-# --- Productivity / PKM ---
+# productivity / PKM
 cask "obsidian"
 cask "raycast"
 cask "setapp"
 cask "hazel"
 cask "hyperkey"
 
-# --- Comms ---
+# comms
 cask "slack"
 cask "whatsapp"
 cask "zoom"
 cask "linear"
 
-# --- Dev ---
+# dev
 cask "iterm2"
 cask "tower"
 cask "kaleidoscope"
-cask "antigravity-cli"
-{{ if .laptop -}}
-cask "antigravity-ide"   # laptop only
-{{ end -}}
+cask "antigravity-ide"
 
-# --- Media / design ---
+# media / design
 cask "figma"
 cask "vlc"
 cask "handbrake-app"
 
-# --- Hardware / desk ---
+# hardware / desk
 cask "elgato-camera-hub"
 cask "elgato-control-center"
 cask "elgato-stream-deck"
 cask "keyboard-cleaner"
 cask "mutedeck"
-
-# --- Java (Android / React Native toolchain) ---
-cask "zulu@17"
+{{ end -}}
+{{ end -}}
