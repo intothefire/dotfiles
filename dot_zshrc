@@ -56,8 +56,5 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # --- Antigravity CLI (installed via Homebrew now; binary on /opt/homebrew/bin) ---
 export PATH="$HOME/.local/bin:$PATH"
 
-# --- RVM (load last so it can put its gem bin first on PATH) ---
-[[ -f "$HOME/.zsh_rc_files/rvm" ]] && source "$HOME/.zsh_rc_files/rvm"
-
 # --- Syntax highlighting: MUST be sourced last ---
 source "${HOMEBREW_PREFIX:-/opt/homebrew}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" 2>/dev/null

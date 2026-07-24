@@ -1,0 +1,5 @@
+# ~/.zshenv — sourced for EVERY zsh invocation (login, interactive, and scripts).
+# Keep this minimal; it runs even for non-interactive `zsh -c`.
+
+# Rust / cargo on PATH.
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
