@@ -38,10 +38,10 @@ Linux support is built and Mac-verified (Mac renders/behaviour unchanged). On a 
 
 - **Packages**: `Brewfile.tmpl` excludes mac-only formulae; casks are skipped entirely.
 - **Bootstrap** (`run_once_01`): installs Homebrew-on-Linux (with `build-essential` etc.),
-  runs `brew bundle` (no Caskfile), skips Xcode/rvm, sets up node via mise + `uv` for Python.
+  runs `brew bundle` (no Caskfile), skips Xcode, sets up node via mise + `uv` for Python (no Ruby on server).
 - **Shell**: `.zprofile`/`.zshrc` detect the brew prefix (`/home/linuxbrew` vs `/opt/homebrew`)
   so completions/plugins resolve; gcloud is guarded; the mac-only hooks (Kiro, Antigravity,
-  JetBrains, rvm) are `[[ -f ]]`-guarded no-ops.
+  JetBrains) are `[[ -f ]]`-guarded no-ops.
 - **tmux clipboard**: `pbcopy → xclip → wl-copy` fallback chain; headless SSH falls back to
   tmux `set-clipboard` (OSC 52), which copies to *your laptop's* clipboard.
 
