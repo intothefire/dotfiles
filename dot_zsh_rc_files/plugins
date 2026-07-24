@@ -18,3 +18,10 @@ command -v fzf >/dev/null 2>&1 && source <(fzf --zsh) 2>/dev/null
 
 # zoxide: `z <dir>` frecency jumping, `zi` for interactive pick
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+
+# atuin: better history search. Init AFTER fzf so atuin owns Ctrl-R (fzf keeps
+# Ctrl-T files / Alt-C dirs). --disable-up-arrow leaves ↑ to autosuggestions.
+command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh --disable-up-arrow)"
+
+# direnv: auto-load per-project .envrc (run `direnv allow` once per project)
+command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"

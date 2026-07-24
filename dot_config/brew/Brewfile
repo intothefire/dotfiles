@@ -24,6 +24,8 @@ brew "zoxide"       # smarter cd (`z`)
 brew "eza"          # modern ls (icons + git)
 brew "bat"          # syntax-highlighted cat / pager
 brew "git-delta"    # git diff pager
+brew "atuin"        # magical shell history (fuzzy, SQLite, optional sync)
+brew "direnv"       # per-directory env (.envrc)
 
 # --- Dev toolchain ---
 brew "corepack"
