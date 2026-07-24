@@ -1,4 +1,4 @@
-{{- if (eq .chezmoi.os "darwin") -}}
+{{- if and (eq .chezmoi.os "darwin") .laptop -}}
 #!/usr/bin/env zsh
 #
 # Rebuild the Dock from a known list (captured from the live machine 2026-07).
