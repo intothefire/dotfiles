@@ -82,29 +82,27 @@ tmux server starts (e.g. after a reboot). Pane contents and nvim sessions are ca
 
 ---
 
-## Session templates (preset layouts)
+## Session templates with tmuxinator
 
-`tproj` (defined in `~/.zsh_rc_files/commands/tmux`) opens — or re-attaches to — a
-project session with a preset layout: 3 windows — `edit`, `run` (two side-by-side
-panes), `git`.
+Define reusable layouts in YAML at `~/.config/tmuxinator/<name>.yml`, then launch them.
+`mux` is an alias for `tmuxinator`.
 
 ```sh
-tproj                  # session named after the current directory
-tproj api              # named "api", current dir
-tproj api ~/code/api   # named "api", a specific dir
+mux list            # your projects
+mux new work        # create one (opens $EDITOR)
+mux start work      # start it (or attach if already running)
+mux edit work       # edit its config
+mux stop work       # kill the session
 ```
 
-Run it again later and it just re-attaches. Make it yours by editing the function:
-change the windows/splits, or uncomment the `tmux send-keys '<cmd>' C-m` lines to
-**auto-run** commands on launch (open nvim, start a dev server, `test --watch`, …).
-
-**Prefer declarative YAML?** `tmuxinator` (Ruby) or `tmuxp` (Python) define per-project
-layouts in a config file instead of a shell function:
+A starter for this repo ships already — `mux start dotfiles`
+(`~/.config/tmuxinator/dotfiles.yml`). A richer example:
 
 ```yaml
-# ~/.config/tmuxinator/api.yml   →   run with:  mux start api
+# ~/.config/tmuxinator/api.yml
 name: api
 root: ~/code/api
+startup_window: edit
 windows:
   - edit: nvim .
   - run:
@@ -112,8 +110,11 @@ windows:
       panes:
         - npm run dev
         - npm test -- --watch
-  - git: null
+  - git:
 ```
+
+Each list item is a window; `panes:` splits it (with an optional `layout:`); a string
+value auto-runs that command. `mux debug <name>` prints the tmux commands it would run.
 
 ## 30-second first drive
 

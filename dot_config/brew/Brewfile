@@ -15,6 +15,7 @@ brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 brew "zsh-you-should-use"
 brew "tmux"
+brew "tmuxinator"   # declarative tmux session layouts (`mux`)
 brew "coreutils"
 brew "terminal-notifier"
 

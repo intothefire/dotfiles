@@ -1,0 +1,14 @@
+# tmuxinator project for the dotfiles repo.  Run:  mux start dotfiles
+# New project: `mux new <name>` · edit: `mux edit <name>` · list: `mux list`
+name: dotfiles
+root: ~/Projects/norman.me/dotfiles
+startup_window: edit
+
+windows:
+  - edit:                     # one shell in the repo root (drop `nvim .` here if you like)
+  - status:
+      layout: even-horizontal
+      panes:
+        - git status
+        - chezmoi diff
+  - shell:
