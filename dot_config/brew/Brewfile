@@ -18,11 +18,20 @@ brew "tmux"
 brew "coreutils"
 brew "terminal-notifier"
 
+# --- Modern CLI ---
+brew "fzf"          # fuzzy finder (Ctrl-R history, file picker)
+brew "zoxide"       # smarter cd (`z`)
+brew "eza"          # modern ls (icons + git)
+brew "bat"          # syntax-highlighted cat / pager
+brew "git-delta"    # git diff pager
+brew "atuin"        # magical shell history (fuzzy, SQLite, optional sync)
+brew "direnv"       # per-directory env (.envrc)
+
 # --- Dev toolchain ---
 brew "corepack"
 brew "gh"
 brew "go"
-brew "nvm"
+brew "mise"        # polyglot version manager (node; replaces nvm)
 brew "nx"
 brew "watchman"
 brew "jq"
