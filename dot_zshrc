@@ -2,12 +2,19 @@
 # Prompt: starship.  Framework: none — oh-my-zsh removed, replaced by the lean
 # fragments under ~/.zsh_rc_files/.
 
+# --- Homebrew env (login shells get this from .zprofile; non-login/tmux need it) ---
+if [[ -z "$HOMEBREW_PREFIX" ]]; then
+  for _b in /opt/homebrew/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+    [[ -x "$_b" ]] && eval "$("$_b" shellenv)" && break
+  done; unset _b
+fi
+
 # --- Completion fpath (must be set BEFORE compinit runs below) ---
 # Homebrew periodically resets its share dir to group-writable, which trips zsh's
 # compinit security audit (the "insecure directories" prompt). Re-secure it each start.
-if [[ -d /opt/homebrew/share ]]; then
-  chmod g-w /opt/homebrew/share 2>/dev/null
-  fpath=(/opt/homebrew/share/zsh/site-functions /opt/homebrew/share/zsh-completions $fpath)
+if [[ -n "$HOMEBREW_PREFIX" && -d "$HOMEBREW_PREFIX/share" ]]; then
+  chmod g-w "$HOMEBREW_PREFIX/share" 2>/dev/null
+  fpath=("$HOMEBREW_PREFIX/share/zsh/site-functions" "$HOMEBREW_PREFIX/share/zsh-completions" $fpath)
 fi
 
 # OPENSPEC:START
