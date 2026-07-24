@@ -31,7 +31,7 @@ brew "direnv"       # per-directory env (.envrc)
 brew "corepack"
 brew "gh"
 brew "go"
-brew "nvm"
+brew "mise"        # polyglot version manager (node; replaces nvm)
 brew "nx"
 brew "watchman"
 brew "jq"

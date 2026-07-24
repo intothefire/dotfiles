@@ -29,13 +29,11 @@ rvm --default use 4.0.6
 # non-zero exits (e.g. corepack shims already present) so a re-run doesn't abort
 # the whole script — brew bundle above stays strict so real failures still surface.
 
-# 5. Node via nvm (nvm installed by brew in step 3)
-(
-  export NVM_DIR="$HOME/.nvm"
-  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
-  node_version="$(nvm version-remote --lts)"   # latest LTS at install time (has corepack)
-  nvm install "$node_version" --default
-) || true
+# 5. Node via mise (installed by brew in step 3)
+if command -v mise >/dev/null 2>&1; then
+  mise use -g node@latest
+  eval "$(mise activate bash)"
+fi
 
 # 6. JS package managers via corepack (ships with node)
 corepack enable || true

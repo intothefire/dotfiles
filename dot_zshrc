@@ -26,7 +26,7 @@ compinit
 
 # --- Shell config fragments (order matters) ---
 ZSH_RC_FILES="$HOME/.zsh_rc_files"
-for frag in core plugins aliases nvm wt path; do
+for frag in core plugins aliases mise wt path; do
   [[ -f "$ZSH_RC_FILES/$frag" ]] && source "$ZSH_RC_FILES/$frag"
 done
 [[ -f "$ZSH_RC_FILES/commands/life-admin" ]] && source "$ZSH_RC_FILES/commands/life-admin"
