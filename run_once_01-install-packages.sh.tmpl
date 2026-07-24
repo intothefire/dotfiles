@@ -1,17 +1,23 @@
 #!/usr/bin/env {{ if eq .chezmoi.os "darwin" }}zsh{{ else }}bash{{ end }}
 #
 # First-run bootstrap: Homebrew, packages, language runtimes, JS/Python toolchain.
-# Templated by role/os (see .chezmoi.toml.tmpl). Ordering matters — brew before
-# bundle; node (mise, via brew) before corepack/bun/eas.
+# Templated by role/os (see .chezmoi.toml.tmpl).
 #   role = {{ .role }}   os = {{ .chezmoi.os }}
+#
+# Failure policy: CRITICAL steps (Homebrew, brew bundle) call die() -> non-zero
+# exit, so chezmoi does NOT record run_once as complete and WILL retry. Fragile
+# but non-essential steps (Ruby build, corepack, eas) warn and continue. This
+# script must never exit 0 on a broken foundation.
+
+die()  { echo "FATAL: $*" >&2; exit 1; }
+warn() { echo "WARN:  $*" >&2; }
 {{ if eq .chezmoi.os "darwin" }}
 # 1. Xcode Command Line Tools
 xcode-select --install 2>/dev/null || true
 {{ end }}
-# 2. Homebrew
+# 2. Homebrew — CRITICAL
 if ! command -v brew >/dev/null 2>&1; then
 {{- if eq .chezmoi.os "linux" }}
-  # Homebrew-on-Linux build prerequisites
   command -v apt-get >/dev/null 2>&1 && sudo apt-get update && \
     sudo apt-get install -y build-essential procps curl file git
 {{- end }}
@@ -24,26 +30,28 @@ for b in /home/linuxbrew/.linuxbrew/bin/brew "$HOME/.linuxbrew/bin/brew"; do
   [ -x "$b" ] && eval "$("$b" shellenv)" && break
 done
 {{- end }}
+command -v brew >/dev/null 2>&1 || die "Homebrew not on PATH after install — not recording run_once so it retries."
 
-# 3. Formulae{{ if eq .chezmoi.os "darwin" }} + casks{{ end }}
-brew bundle --file="$HOME/.config/brew/Brewfile"
+# 3. Formulae{{ if eq .chezmoi.os "darwin" }} + casks{{ end }} — CRITICAL
+brew bundle --file="$HOME/.config/brew/Brewfile" || die "brew bundle (Brewfile) failed."
 {{- if eq .chezmoi.os "darwin" }}
-brew bundle --file="$HOME/.config/brew/Caskfile"
+brew bundle --file="$HOME/.config/brew/Caskfile" || die "brew bundle (Caskfile) failed."
 {{- end }}
 {{ if or (eq .role "laptop") (eq .role "mac-dev") }}
-# 4. Ruby via RVM (mac dev machines only)
-if [ ! -d "$HOME/.rvm" ]; then \curl -sSL https://get.rvm.io | bash -s stable; fi
-source "$HOME/.rvm/scripts/rvm"
-# Install only if that exact ruby is missing — never rebuild an existing one.
-rvm list strings 2>/dev/null | grep -qx 'ruby-4.0.6' || rvm install 4.0.6
-rvm --default use 4.0.6
+# 4. Ruby via RVM (mac dev machines) — best-effort (ruby-build is fragile on new macOS)
+if [ ! -d "$HOME/.rvm" ]; then \curl -sSL https://get.rvm.io | bash -s stable || warn "rvm install failed"; fi
+if [ -s "$HOME/.rvm/scripts/rvm" ]; then
+  source "$HOME/.rvm/scripts/rvm"
+  rvm list strings 2>/dev/null | grep -qx 'ruby-4.0.6' || rvm install 4.0.6 || warn "ruby 4.0.6 build failed"
+  rvm --default use 4.0.6 || warn "could not select ruby 4.0.6"
+fi
 {{ end }}
-# From here steps are idempotent; tolerate benign non-zero exits.
+# From here: idempotent toolchain — warn but don't fail the box on benign errors.
 
-# 5. Node via mise (installed by brew above)
+# 5. Node via mise (from brew above)
 if command -v mise >/dev/null 2>&1; then
-  mise use -g node@latest
-  eval "$(mise activate bash)"
+  mise use -g node@latest || warn "mise node install failed"
+  eval "$(mise activate bash)" 2>/dev/null || true
 fi
 
 # 6. JS package managers via corepack
@@ -52,14 +60,13 @@ corepack prepare yarn@stable --activate || true    # Yarn 4.x
 corepack prepare pnpm@latest --activate || true
 
 # 7. Python via uv
-if ! command -v uv >/dev/null 2>&1; then curl -fsSL https://astral.sh/uv/install.sh | sh; fi
+command -v uv >/dev/null 2>&1 || curl -fsSL https://astral.sh/uv/install.sh | sh || warn "uv install failed"
 
 # 8. Bun
-if ! command -v bun >/dev/null 2>&1; then curl -fsSL https://bun.sh/install | bash; fi
+command -v bun >/dev/null 2>&1 || curl -fsSL https://bun.sh/install | bash || warn "bun install failed"
 export BUN_INSTALL="$HOME/.bun"; export PATH="$BUN_INSTALL/bin:$PATH"
 {{ if or (eq .role "laptop") (eq .role "mac-dev") }}
 # 9. Global CLIs (mobile/RN)
-bun add --global eas-cli || true    # Expo Application Services
+bun add --global eas-cli || warn "eas-cli install failed"
 {{ end }}
 echo "Bootstrap complete. Restart your shell."
-exit 0
