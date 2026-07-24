@@ -1,10 +1,12 @@
-# Intentionally empty.
-#
-# The old setup vendored oh-my-zsh, powerlevel10k, zsh-syntax-highlighting and
-# zsh-history-substring-search here. That's all gone:
-#   - oh-my-zsh + powerlevel10k were removed (starship is the prompt now).
-#   - zsh-autosuggestions / zsh-syntax-highlighting are installed via Homebrew
-#     (see dot_config/brew/Brewfile) and sourced from ~/.zsh_rc_files/plugins.
-#
-# Add [".path"] blocks here only if you need chezmoi to pull an external archive
-# or file that Homebrew can't provide.
+# External resources chezmoi clones into $HOME on apply.
+# zsh plugins come from Homebrew (see Brewfile), not here.
+
+# tmux plugins (no brew formulae; no TPM needed — sourced directly in ~/.tmux.conf)
+[".config/tmux/plugins/tmux-resurrect"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tmux-resurrect.git"
+    refreshPeriod = "168h"
+[".config/tmux/plugins/tmux-continuum"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tmux-continuum.git"
+    refreshPeriod = "168h"
