@@ -1,0 +1,34 @@
+# Core zsh behaviour — replaces oh-my-zsh's core (options, history, keybindings,
+# completion styling). Completion is initialised (compinit) in ~/.zshrc.
+
+# --- Options ---
+setopt AUTO_CD                # `foo` -> `cd foo` when foo is a directory
+setopt EXTENDED_GLOB
+setopt INTERACTIVE_COMMENTS   # allow `# comments` at an interactive prompt
+setopt NO_BEEP
+
+# --- History ---
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=50000
+export SAVEHIST=50000
+setopt SHARE_HISTORY          # share history live across sessions
+setopt HIST_IGNORE_ALL_DUPS   # collapse duplicate commands
+setopt HIST_IGNORE_SPACE      # ` cmd` (leading space) stays out of history
+setopt HIST_REDUCE_BLANKS
+setopt HIST_VERIFY            # expand `!!` onto the line instead of running blind
+
+# --- Keybindings (emacs) ---
+bindkey -e
+bindkey '^[[H' beginning-of-line
+bindkey '^[[F' end-of-line
+bindkey '^[[3~' delete-char
+
+# --- Colours ---
+export CLICOLOR=1
+[[ -f "$HOME/.config/zsh/lscolors.sh" ]] && source "$HOME/.config/zsh/lscolors.sh"
+
+# --- Completion styling (consulted lazily, safe to set after compinit) ---
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'   # case-insensitive
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' group-name ''

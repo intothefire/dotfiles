@@ -1,23 +1,10 @@
-[".oh-my-zsh"]
-    type = "archive"
-    url = "https://github.com/ohmyzsh/ohmyzsh/archive/master.tar.gz"
-    exact = true
-    stripComponents = 1
-    refreshPeriod = "168h"
-[".oh-my-zsh/custom/plugins/zsh-syntax-highlighting"]
-    type = "archive"
-    url = "https://github.com/zsh-users/zsh-syntax-highlighting/archive/master.tar.gz"
-    exact = true
-    stripComponents = 1
-    refreshPeriod = "168h"
-[".oh-my-zsh/custom/plugins/zsh-history-substring-search"]
-    type = "archive"
-    url = "https://github.com/zsh-users/zsh-history-substring-search/archive/master.tar.gz"
-    exact = true
-    stripComponents = 1
-    refreshPeriod = "168h"
-[".oh-my-zsh/custom/themes/powerlevel10k"]
-    type = "archive"
-    url = "https://github.com/romkatv/powerlevel10k/archive/v1.15.0.tar.gz"
-    exact = true
-    stripComponents = 1
+# Intentionally empty.
+#
+# The old setup vendored oh-my-zsh, powerlevel10k, zsh-syntax-highlighting and
+# zsh-history-substring-search here. That's all gone:
+#   - oh-my-zsh + powerlevel10k were removed (starship is the prompt now).
+#   - zsh-autosuggestions / zsh-syntax-highlighting are installed via Homebrew
+#     (see dot_config/brew/Brewfile) and sourced from ~/.zsh_rc_files/plugins.
+#
+# Add [".path"] blocks here only if you need chezmoi to pull an external archive
+# or file that Homebrew can't provide.

@@ -1,0 +1,14 @@
+# Standalone zsh plugins (Homebrew) — replaces oh-my-zsh's plugin list.
+# zsh-syntax-highlighting is intentionally NOT here: it must be sourced last,
+# so it lives at the very end of ~/.zshrc.
+
+brew_prefix="${HOMEBREW_PREFIX:-/opt/homebrew}"
+
+# Fish-style autosuggestions (accept with -> / End)
+source "$brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh" 2>/dev/null
+
+# "you-should-use": nudges you toward an existing alias after you type the long
+# form. Standalone replacement for oh-my-zsh's alias-finder.
+source "$brew_prefix/share/zsh-you-should-use/you-should-use.plugin.zsh" 2>/dev/null
+
+unset brew_prefix

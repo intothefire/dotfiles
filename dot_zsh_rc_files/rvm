@@ -1,0 +1,4 @@
+# Load RVM into the shell and activate the default ruby.
+# Replaces the oh-my-zsh `rvm` plugin that did this before oh-my-zsh was removed.
+# Sourced late in ~/.zshrc so RVM can place its gem bin first on PATH.
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"

@@ -1,58 +1,63 @@
-# Fig pre block. Keep at the top of this file.
-. "$HOME/.fig/shell/zshrc.pre.zsh"
+# ~/.zshrc — managed by chezmoi (github.com/intothefire/dotfiles)
+# Prompt: starship.  Framework: none — oh-my-zsh removed, replaced by the lean
+# fragments under ~/.zsh_rc_files/.
 
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# --- Completion fpath (must be set BEFORE compinit runs below) ---
+# Homebrew periodically resets its share dir to group-writable, which trips zsh's
+# compinit security audit (the "insecure directories" prompt). Re-secure it each start.
+if [[ -d /opt/homebrew/share ]]; then
+  chmod g-w /opt/homebrew/share 2>/dev/null
+  fpath=(/opt/homebrew/share/zsh/site-functions /opt/homebrew/share/zsh-completions $fpath)
 fi
 
-# If not running interactively, don't do anything
+# OPENSPEC:START
+# OpenSpec shell completions configuration
+fpath=("$HOME/.oh-my-zsh/custom/completions" $fpath)
+autoload -Uz compinit
+compinit
+# OPENSPEC:END
 
+# --- Machine-local secrets (gitignored; NOT in the dotfiles repo) ---
+# See ~/.config/.secrets. Holds OP_SERVICE_ACCOUNT_TOKEN + API keys.
+[[ -f "$HOME/.config/.secrets" ]] && source "$HOME/.config/.secrets"
 
-[ -z "$PS1" ] && return
-DOTFILES_DIR="$HOME/.config/.system"
+# --- Kiro CLI (pre block — keep near the top) ---
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
 
-if [ ! -d "$DOTFILES_DIR" ]; then
-  echo "Unable to find dotfiles, exiting."
-  return
-fi
-
-# Make utilities available
-
-PATH="$DOTFILES_DIR/bin:$PATH"
-
-# Source the dotfiles (order matters)
-
-for DOTFILE in "$DOTFILES_DIR"/.{function,paths,nvm,rvm,homebrew,secure,alias,oh-my}; do
-  [ -f "$DOTFILE" ] && . "$DOTFILE"
+# --- Shell config fragments (order matters) ---
+ZSH_RC_FILES="$HOME/.zsh_rc_files"
+for frag in core plugins aliases nvm wt path; do
+  [[ -f "$ZSH_RC_FILES/$frag" ]] && source "$ZSH_RC_FILES/$frag"
 done
+[[ -f "$ZSH_RC_FILES/commands/life-admin" ]] && source "$ZSH_RC_FILES/commands/life-admin"
+unset ZSH_RC_FILES
 
-# Clean up
+# --- 1Password shell plugins (biometric-gated CLI auth) ---
+# Configure per CLI with `op plugin init gh` (etc.). Harmless until one exists.
+[[ -f "$HOME/.config/op/plugins.sh" ]] && source "$HOME/.config/op/plugins.sh"
 
-unset DOTFILE
+# --- Java ---
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
 
-# Export
+# --- Prompt ---
+eval "$(starship init zsh)"
 
-export DOTFILES_DIR
+# --- Kiro CLI (post block — keep near the bottom) ---
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
 
-test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
+# --- worktrunk (needs compinit above for completions) ---
+if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
 
-# [z - jump around](https://github.com/rupa/z)
-if [ -f `brew --prefix`/etc/profile.d/z.sh ]; then
-  . `brew --prefix`/etc/profile.d/z.sh
-fi
+# --- bun ---
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+[ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
 
-autoload -U compinit; compinit
+# --- Antigravity CLI (installed via Homebrew now; binary on /opt/homebrew/bin) ---
+export PATH="$HOME/.local/bin:$PATH"
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f "$DOTFILES_DIR/config/zsh/.p10k.zsh" ]] || source "$DOTFILES_DIR/config/zsh/.p10k.zsh"
+# --- RVM (load last so it can put its gem bin first on PATH) ---
+[[ -f "$HOME/.zsh_rc_files/rvm" ]] && source "$HOME/.zsh_rc_files/rvm"
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# To customize prompt, run `p10k configure` or edit ~/.config/zsh/.p10k.zsh.
-[[ ! -f ~/.config/zsh/.p10k.zsh ]] || source ~/.config/zsh/.p10k.zsh
-
+# --- Syntax highlighting: MUST be sourced last ---
+source "${HOMEBREW_PREFIX:-/opt/homebrew}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" 2>/dev/null
