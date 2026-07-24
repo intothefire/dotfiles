@@ -1,4 +1,0 @@
-# mise global tool versions (github.com/jdx/mise). Per-project overrides via
-# .mise.toml / .tool-versions in a repo. Ruby stays on rvm (see ~/.zlogin).
-[tools]
-node = "latest"

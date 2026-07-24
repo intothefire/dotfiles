@@ -44,20 +44,12 @@ brew bundle --file="$HOME/.config/brew/Brewfile" || die "brew bundle (Brewfile) 
 {{- if eq .chezmoi.os "darwin" }}
 brew bundle --file="$HOME/.config/brew/Caskfile" || die "brew bundle (Caskfile) failed."
 {{- end }}
-{{ if or (eq .role "laptop") (eq .role "mac-dev") }}
-# 4. Ruby via RVM (mac dev machines) — best-effort (ruby-build is fragile on new macOS)
-if [ ! -d "$HOME/.rvm" ]; then \curl -sSL https://get.rvm.io | bash -s stable || warn "rvm install failed"; fi
-if [ -s "$HOME/.rvm/scripts/rvm" ]; then
-  source "$HOME/.rvm/scripts/rvm"
-  rvm list strings 2>/dev/null | grep -qx 'ruby-4.0.6' || rvm install 4.0.6 || warn "ruby 4.0.6 build failed"
-  rvm --default use 4.0.6 || warn "could not select ruby 4.0.6"
-fi
-{{ end }}
 # From here: idempotent toolchain — warn but don't fail the box on benign errors.
 
-# 5. Node via mise (from brew above)
+# 4. Node + Ruby via mise (versions from ~/.config/mise/config.toml — ruby is
+#    gated to mac dev machines there). No rvm, no GPG signature dance.
 if command -v mise >/dev/null 2>&1; then
-  mise use -g node@latest || warn "mise node install failed"
+  mise install || warn "mise install (node/ruby) had errors"
   eval "$(mise activate bash)" 2>/dev/null || true
 fi
 

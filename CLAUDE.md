@@ -72,9 +72,10 @@ share one app — uninstalling either token removes the app; verify the target b
 
 ## Provisioning (run_once, in order)
 
-1. `run_once_01-install-packages.sh` — Homebrew → `brew bundle` → rvm/Ruby 3.4.5 →
-   nvm/Node LTS → corepack (Yarn 4 + pnpm) → bun → `bun add -g eas-cli`. Order matters:
-   brew before bundle, node before corepack/bun.
+1. `run_once_01-install-packages.sh.tmpl` — Homebrew → trust taps → `brew bundle` →
+   **mise** (Node + Ruby 4.0.6, via its config) → corepack (Yarn 4 + pnpm) → uv → bun →
+   eas. Critical steps (brew install, `brew bundle`) fail loud so chezmoi retries;
+   toolchain steps warn. Role/os-gated; no RVM/nvm.
 2. `run_once_02-configure-mac.sh.tmpl` — macOS `defaults`. Carries `FIX:`/`FLAG:` comments
    from a 2026 review pass; some blocks (Mail, Terminal.app) are no-ops for this setup.
 3. `run_once_03-configure-dock.sh.tmpl` — rebuilds the Dock via `dockutil`. JetBrains apps

@@ -1,0 +1,7 @@
+# mise global tool versions (github.com/jdx/mise). Per-project overrides via
+# .mise.toml / .tool-versions in a repo.
+[tools]
+node = "latest"
+{{ if or (eq .role "laptop") (eq .role "mac-dev") -}}
+ruby = "4.0.6"
+{{ end -}}

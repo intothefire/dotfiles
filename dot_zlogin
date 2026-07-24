@@ -1,3 +1,0 @@
-# Load RVM into the shell session *as a function* (RVM's canonical placement:
-# a login file, sourced last so its gem bin lands first on PATH).
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
