@@ -1,0 +1,56 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/usr/bin/env zsh
+#
+# Rebuild the Dock from a known list (captured from the live machine 2026-07).
+# FLAG: this is a personal list — trim to taste. Requires dockutil (Brewfile).
+# JetBrains apps come from Toolbox at stable ~/Applications paths (no version pin).
+
+if [ -f /opt/homebrew/bin/brew ]; then eval "$(/opt/homebrew/bin/brew shellenv)"; fi
+command -v dockutil >/dev/null 2>&1 || { echo "dockutil not installed; skipping Dock setup"; return 0; }
+
+# Add an app only if it exists, so a missing app doesn't abort the run.
+add() { [ -e "$1" ] && dockutil --no-restart --add "$1" >/dev/null || echo "  skip (missing): $1"; }
+
+dockutil --no-restart --remove all >/dev/null
+
+# --- Comms / daily ---
+add "/Applications/1Password.app"
+add "/System/Applications/Messages.app"
+add "/Applications/Fantastical.app"
+add "/Applications/Slack.app"
+add "/Applications/WhatsApp.app"
+add "/Applications/Telegram Lite.app"
+
+# --- Notes / AI ---
+add "/Applications/Obsidian.app"
+add "/Applications/Claude.app"
+add "/Applications/ChatGPT.app"
+
+# --- Web ---
+add "/Applications/Safari.app"
+add "/Applications/Google Chrome.app"
+add "/Applications/Figma.app"
+
+# --- Dev (JetBrains from Toolbox live in ~/Applications) ---
+add "$HOME/Applications/WebStorm.app"
+add "$HOME/Applications/PyCharm.app"
+add "$HOME/Applications/RustRover.app"
+add "$HOME/Applications/Android Studio.app"
+add "/Applications/Xcode-beta.app"
+add "/Applications/Tower.app"
+add "/Applications/Kaleidoscope.app"
+add "/Applications/iTerm.app"
+
+# --- Media ---
+add "/System/Applications/Music.app"
+add "/Applications/MusicBrainz Picard.app"
+
+# --- Downloads stack ---
+dockutil --no-restart --add '~/Downloads' --view fan --display stack --allhomes >/dev/null
+
+killall Dock
+
+echo "Dock configured."
+
+return 0
+{{ end -}}

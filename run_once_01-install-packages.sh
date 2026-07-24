@@ -1,23 +1,53 @@
 #!/usr/bin/env zsh
+#
+# First-run bootstrap: Homebrew, packages, language runtimes, JS toolchain.
+# Ordering matters — brew must exist before `brew bundle`, and node (via nvm,
+# installed by brew) must exist before corepack/bun/eas.
 
-# sudo softwareupdate -i -a
-xcode-select --install
+# 1. Xcode Command Line Tools (no-op if already present)
+xcode-select --install 2>/dev/null || true
 
-# sudo softwareupdate --install-rosetta
+# 2. Homebrew (Apple Silicon)
+if ! command -v brew >/dev/null 2>&1; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+[ -f /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
 
-NVM_DIR=~/.nvm
-RVM_DIR=~/.rvm
+# 3. Formulae + casks
+brew bundle --file="$HOME/.config/brew/Brewfile"
+brew bundle --file="$HOME/.config/brew/Caskfile"
 
-# curl -fsSL -o install.sh https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh && /bin/bash install.sh && rm -rf install.sh
+# 4. Ruby via RVM
+if [ ! -d "$HOME/.rvm" ]; then \curl -sSL https://get.rvm.io | bash -s stable; fi
+source "$HOME/.rvm/scripts/rvm"
+# Install only if that exact ruby is missing — never rebuild an existing one
+# (rvm list strings prints `ruby-4.0.6`, hence the ruby- prefix in the match).
+rvm list strings 2>/dev/null | grep -qx 'ruby-4.0.6' || rvm install 4.0.6
+rvm --default use 4.0.6
 
-if ! [ -d "$RVM_DIR" ]; then \curl -L https://get.rvm.io | bash -s stable --ruby; fi
-source ${RVM_DIR}/scripts/rvm
-rvm install ruby-2.7.3
-rvm install ruby-2.7.4
-rvm --default use 2.7.4
+# From here on the steps are idempotent and safe to re-run. Tolerate benign
+# non-zero exits (e.g. corepack shims already present) so a re-run doesn't abort
+# the whole script — brew bundle above stays strict so real failures still surface.
 
-mkdir -p "$NVM_DIR"
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | /bin/zsh
-. ${NVM_DIR}/nvm.sh && nvm install --lts
+# 5. Node via nvm (nvm installed by brew in step 3)
+(
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+  node_version="$(nvm version-remote --lts)"   # latest LTS at install time (has corepack)
+  nvm install "$node_version" --default
+) || true
 
-npm install -g i18next-parser
+# 6. JS package managers via corepack (ships with node)
+corepack enable || true
+corepack prepare yarn@stable --activate || true    # Yarn 4.x
+corepack prepare pnpm@latest --activate || true
+
+# 7. Bun (its own installer; ~/.bun)
+if ! command -v bun >/dev/null 2>&1; then curl -fsSL https://bun.sh/install | bash; fi
+export BUN_INSTALL="$HOME/.bun"; export PATH="$BUN_INSTALL/bin:$PATH"
+
+# 8. Global CLIs
+bun add --global eas-cli || true    # Expo Application Services (React Native)
+
+echo "Bootstrap complete. Restart your shell..."
+exit 0

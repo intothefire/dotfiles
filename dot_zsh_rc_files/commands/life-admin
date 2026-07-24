@@ -1,0 +1,5 @@
+life() {
+  openclaw tui \
+    --url wss://trillian.tail8749b.ts.net \
+    --token "${OPENCLAW_TOKEN:?set OPENCLAW_TOKEN in ~/.config/.secrets}"
+}
