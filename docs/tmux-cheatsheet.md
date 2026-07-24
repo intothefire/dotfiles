@@ -82,6 +82,39 @@ tmux server starts (e.g. after a reboot). Pane contents and nvim sessions are ca
 
 ---
 
+## Session templates (preset layouts)
+
+`tproj` (defined in `~/.zsh_rc_files/commands/tmux`) opens — or re-attaches to — a
+project session with a preset layout: 3 windows — `edit`, `run` (two side-by-side
+panes), `git`.
+
+```sh
+tproj                  # session named after the current directory
+tproj api              # named "api", current dir
+tproj api ~/code/api   # named "api", a specific dir
+```
+
+Run it again later and it just re-attaches. Make it yours by editing the function:
+change the windows/splits, or uncomment the `tmux send-keys '<cmd>' C-m` lines to
+**auto-run** commands on launch (open nvim, start a dev server, `test --watch`, …).
+
+**Prefer declarative YAML?** `tmuxinator` (Ruby) or `tmuxp` (Python) define per-project
+layouts in a config file instead of a shell function:
+
+```yaml
+# ~/.config/tmuxinator/api.yml   →   run with:  mux start api
+name: api
+root: ~/code/api
+windows:
+  - edit: nvim .
+  - run:
+      layout: even-horizontal
+      panes:
+        - npm run dev
+        - npm test -- --watch
+  - git: null
+```
+
 ## 30-second first drive
 
 1. `tmux new -s test` — the bar appears at the top
