@@ -27,6 +27,10 @@ bindkey '^[[3~' delete-char
 export CLICOLOR=1
 [[ -f "$HOME/.config/zsh/lscolors.sh" ]] && source "$HOME/.config/zsh/lscolors.sh"
 
+# --- bat (syntax-highlighted cat / pager) — matches the starship gruvbox palette ---
+export BAT_THEME="gruvbox-dark"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"   # pretty man pages
+
 # --- Completion styling (consulted lazily, safe to set after compinit) ---
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'   # case-insensitive

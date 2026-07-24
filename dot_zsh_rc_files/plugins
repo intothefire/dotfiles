@@ -12,3 +12,9 @@ source "$brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh" 2>/dev/n
 source "$brew_prefix/share/zsh-you-should-use/you-should-use.plugin.zsh" 2>/dev/null
 
 unset brew_prefix
+
+# fzf: fuzzy history (Ctrl-R), file picker (Ctrl-T), dir jump (Alt-C)
+command -v fzf >/dev/null 2>&1 && source <(fzf --zsh) 2>/dev/null
+
+# zoxide: `z <dir>` frecency jumping, `zi` for interactive pick
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"

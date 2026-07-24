@@ -15,3 +15,9 @@ alias gds='git diff --staged'
 alias gp='git push'
 alias gl='git pull'
 alias glog='git log --oneline --graph --decorate'
+
+# --- ls via eza (icons + git awareness) ---
+alias ls='eza --icons --group-directories-first'
+alias ll='eza --icons --group-directories-first -lh --git'
+alias la='eza --icons --group-directories-first -lah --git'
+alias lt='eza --icons --tree --level=2'

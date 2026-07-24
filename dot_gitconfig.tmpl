@@ -15,10 +15,18 @@
 [core]
 	excludesfile = ~/.config/git/ignore
 	editor = nano
+	pager = delta
 	filemode = false
 	trustctime = false
 	autocrlf = input
 	untrackedCache = true
+
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	line-numbers = true
+	syntax-theme = gruvbox-dark
 
 [grep]
 	lineNumber = true
