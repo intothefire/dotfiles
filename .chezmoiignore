@@ -1,5 +1,6 @@
 # Repo meta-files — must NOT be deployed into $HOME.
 README.md
 CLAUDE.md
+docs
 .gitignore
 .idea
