@@ -31,6 +31,11 @@ export CLICOLOR=1
 export BAT_THEME="gruvbox-dark"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"   # pretty man pages
 
+# --- fzf (gruvbox theme + previews) ---
+export FZF_DEFAULT_OPTS="--height 40% --layout reverse --border --color=bg+:#3c3836,bg:#282828,spinner:#fe8019,hl:#928374,fg:#ebdbb2,header:#928374,info:#8ec07c,pointer:#fe8019,marker:#fe8019,fg+:#ebdbb2,prompt:#fe8019,hl+:#fe8019"
+export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers {} 2>/dev/null || eza -1 --icons --color=always {}'"
+export FZF_ALT_C_OPTS="--preview 'eza -1 --icons --color=always {}'"
+
 # --- Completion styling (consulted lazily, safe to set after compinit) ---
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'   # case-insensitive

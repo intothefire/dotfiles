@@ -25,3 +25,10 @@ command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh --disable-up-arrow)"
 
 # direnv: auto-load per-project .envrc (run `direnv allow` once per project)
 command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+
+# fzf-tab: replace zsh's completion menu with fzf (loads after compinit).
+# Previews dir contents with eza on `cd`.
+source "${HOMEBREW_PREFIX:-/opt/homebrew}/share/fzf-tab/fzf-tab.zsh" 2>/dev/null
+zstyle ':fzf-tab:*' use-fzf-default-opts yes
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --icons --color=always $realpath'
+zstyle ':completion:*:descriptions' format '[%d]'
