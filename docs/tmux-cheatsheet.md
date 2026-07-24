@@ -64,6 +64,17 @@ even a **reboot**. Just `tmux attach` to get it all back.
 | `Enter` or `y` | copy selection |
 | `q` | quit copy mode |
 
+## Power moves
+
+| Keys | Action |
+|---|---|
+| `F12` | toggle local keys **OFF** (status greys, shows `OFF`) so an inner / **SSH'd remote** tmux receives your keys — `F12` again to restore |
+| `y` or `Enter` *(copy mode)* | copy the selection to the **macOS clipboard** (⌘V anywhere) |
+| `prefix Q` | kill session (asks to confirm) |
+| `prefix X` | kill window (asks to confirm) |
+
+The session name in the status bar turns **orange** whenever the prefix is active.
+
 ## Config
 
 | Keys | Action |
