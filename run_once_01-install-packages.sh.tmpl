@@ -32,6 +32,13 @@ done
 {{- end }}
 command -v brew >/dev/null 2>&1 || die "Homebrew not on PATH after install — not recording run_once so it retries."
 
+# Trust the third-party taps the Brewfile declares — newer Homebrew refuses to load
+# formulae from an untrusted tap during `brew bundle` (a fresh-machine blocker).
+grep -E '^tap ' "$HOME/.config/brew/Brewfile" 2>/dev/null | sed -E 's/^tap "([^"]+)".*/\1/' | while read -r t; do
+  brew tap "$t" >/dev/null 2>&1 || true
+  brew trust "$t" >/dev/null 2>&1 || true
+done
+
 # 3. Formulae{{ if eq .chezmoi.os "darwin" }} + casks{{ end }} — CRITICAL
 brew bundle --file="$HOME/.config/brew/Brewfile" || die "brew bundle (Brewfile) failed."
 {{- if eq .chezmoi.os "darwin" }}
