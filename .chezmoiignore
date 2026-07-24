@@ -4,3 +4,8 @@ CLAUDE.md
 docs
 .gitignore
 .idea
+{{ if eq .role "laptop" }}
+# authorized_keys is for the headless boxes (mac-dev / server) only —
+# don't manage the laptop's (it's the controller; leave its ~/.ssh/authorized_keys alone).
+.ssh/authorized_keys
+{{ end }}
