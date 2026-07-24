@@ -1,0 +1,25 @@
+# Terminal AI helpers (backed by the `claude` CLI in headless -p mode).
+
+# ask — one-shot question to Claude. Supports piped stdin:
+#   ask "how do I flatten a list in zsh?"
+#   cat error.log | ask "what's failing here?"
+ask() { command -v claude >/dev/null 2>&1 && claude -p "$*" || echo "claude CLI not found"; }
+
+# gac — draft a Conventional Commits message from staged changes, then confirm.
+#   y = commit, e = commit opening $EDITOR pre-filled, anything else = abort.
+gac() {
+  command -v claude >/dev/null 2>&1 || { echo "claude CLI not found"; return 1; }
+  git diff --cached --quiet && { echo "Nothing staged — 'git add' something first."; return 1; }
+  echo "Drafting commit message…"
+  local msg
+  msg="$(git diff --cached | claude -p 'Write a git commit message for this staged diff using Conventional Commits: an imperative subject line <=60 chars, a blank line, then a short body explaining what and why when useful. Output ONLY the message — no code fences, no preamble.')"
+  [ -z "$msg" ] && { echo "No message generated."; return 1; }
+  print -r -- "\n$msg\n"
+  local reply
+  read -r "reply?Commit (y) / edit (e) / abort (n)? "
+  case "$reply" in
+    y|Y) git commit -m "$msg" ;;
+    e|E) git commit -e -m "$msg" ;;
+    *)   echo "Aborted." ;;
+  esac
+}

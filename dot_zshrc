@@ -29,8 +29,8 @@ ZSH_RC_FILES="$HOME/.zsh_rc_files"
 for frag in core plugins aliases mise wt path; do
   [[ -f "$ZSH_RC_FILES/$frag" ]] && source "$ZSH_RC_FILES/$frag"
 done
-[[ -f "$ZSH_RC_FILES/commands/life-admin" ]] && source "$ZSH_RC_FILES/commands/life-admin"
-unset ZSH_RC_FILES
+for cmd in "$ZSH_RC_FILES"/commands/*(N.); do source "$cmd"; done
+unset ZSH_RC_FILES cmd
 
 # --- 1Password shell plugins (biometric-gated CLI auth) ---
 # Configure per CLI with `op plugin init gh` (etc.). Harmless until one exists.
