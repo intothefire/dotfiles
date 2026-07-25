@@ -2,16 +2,13 @@
 # zsh-syntax-highlighting is intentionally NOT here: it must be sourced last,
 # so it lives at the very end of ~/.zshrc.
 
-brew_prefix="${HOMEBREW_PREFIX:-/opt/homebrew}"
-
-# Fish-style autosuggestions (accept with -> / End)
-source "$brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh" 2>/dev/null
+# Fish-style autosuggestions (accept with -> / End). From brew or apt share dir
+# via the loader defined in ~/.zshrc.
+_source_plugin zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # "you-should-use": nudges you toward an existing alias after you type the long
-# form. Standalone replacement for oh-my-zsh's alias-finder.
-source "$brew_prefix/share/zsh-you-should-use/you-should-use.plugin.zsh" 2>/dev/null
-
-unset brew_prefix
+# form. Not in apt — cloned via .chezmoiexternal, so source from the clone path.
+source "$HOME/.config/zsh/plugins/zsh-you-should-use/you-should-use.plugin.zsh" 2>/dev/null
 
 # fzf: fuzzy history (Ctrl-R), file picker (Ctrl-T), dir jump (Alt-C)
 command -v fzf >/dev/null 2>&1 && source <(fzf --zsh) 2>/dev/null
@@ -27,8 +24,8 @@ command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh --disable-up-arrow)"
 command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
 
 # fzf-tab: replace zsh's completion menu with fzf (loads after compinit).
-# Previews dir contents with eza on `cd`.
-source "${HOMEBREW_PREFIX:-/opt/homebrew}/share/fzf-tab/fzf-tab.zsh" 2>/dev/null
+# Previews dir contents with eza on `cd`. Not in apt — cloned via .chezmoiexternal.
+source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.zsh" 2>/dev/null
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --icons --color=always $realpath'
 zstyle ':completion:*:descriptions' format '[%d]'

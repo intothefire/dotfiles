@@ -3,7 +3,7 @@
 
 {{- $email := promptString "Git email address" }}
 {{- $computer := promptString "Computer Name" }}
-{{- $role := promptString "Role (laptop | mac-dev | server)" "laptop" }}
+{{- $role := promptString "Role (laptop | mac-dev | server | minimal)" "laptop" }}
 {{- $name := "Chris Norman" }}
 
 [data]
@@ -14,6 +14,8 @@
   #   laptop  = this machine — full GUI + mobile + media + everything
   #   mac-dev = headless remote Mac — core + AI + Ruby + mobile/RN + media, no GUI
   #   server  = Linux AI box — core + AI CLIs + Python/uv, no GUI/mac/mobile
+  #   minimal = Raspberry Pi / small box — shell + CLI from apt, no Homebrew, no runtimes
   role = {{ $role | quote }}
   # convenience flags derived from role/os (use these in templates):
   laptop = {{ eq $role "laptop" }}
+  brewless = {{ eq $role "minimal" }}

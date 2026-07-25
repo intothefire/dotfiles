@@ -9,3 +9,10 @@ docs
 # don't manage the laptop's (it's the controller; leave its ~/.ssh/authorized_keys alone).
 .ssh/authorized_keys
 {{ end }}
+{{ if eq .role "minimal" }}
+# minimal (Raspberry Pi): no Homebrew and no mise on these boxes; Tailscale SSH
+# means there's no ~/.ssh at all, so authorized_keys would be pointless noise.
+.config/brew
+.config/mise
+.ssh/authorized_keys
+{{ end }}

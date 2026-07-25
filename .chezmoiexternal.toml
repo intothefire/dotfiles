@@ -1,5 +1,18 @@
 # External resources chezmoi clones into $HOME on apply.
-# zsh plugins come from Homebrew (see Brewfile), not here.
+# Most zsh plugins come from the OS package manager (Homebrew / apt), but the two
+# below aren't packaged in Debian apt, so they're cloned here for ALL roles — one
+# source keeps versions identical on brew and apt machines alike.
+
+# zsh plugins not in apt (Aloxaf/fzf-tab, MichaelAquilina/zsh-you-should-use).
+# Sourced from these clone paths in ~/.zsh_rc_files/plugins.
+[".config/zsh/plugins/fzf-tab"]
+    type = "git-repo"
+    url = "https://github.com/Aloxaf/fzf-tab.git"
+    refreshPeriod = "168h"
+[".config/zsh/plugins/zsh-you-should-use"]
+    type = "git-repo"
+    url = "https://github.com/MichaelAquilina/zsh-you-should-use.git"
+    refreshPeriod = "168h"
 
 # tmux plugins (no brew formulae; no TPM needed — sourced directly in ~/.tmux.conf)
 [".config/tmux/plugins/tmux-resurrect"]

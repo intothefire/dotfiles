@@ -11,6 +11,24 @@
 
 die()  { echo "FATAL: $*" >&2; exit 1; }
 warn() { echo "WARN:  $*" >&2; }
+{{ if .brewless -}}
+# ===== minimal role (Raspberry Pi / small box): apt-only shell stack. =====
+# Runs INSTEAD of the Homebrew path below — no brew, mise, node/ruby, uv, bun, AI CLIs.
+# Idempotent: installs only what's missing, so it is safe to re-run.
+export DEBIAN_FRONTEND=noninteractive
+pkgs="zsh tmux zsh-autosuggestions zsh-syntax-highlighting starship fzf zoxide bat eza git-delta ripgrep direnv"
+missing=""
+for p in $pkgs; do
+  dpkg -s "$p" >/dev/null 2>&1 || missing="$missing $p"
+done
+if [ -n "$missing" ]; then
+  sudo apt-get update || die "apt-get update failed — not recording run_once so it retries."
+  sudo apt-get install -y --no-install-recommends $missing || die "apt install failed:$missing"
+else
+  echo "minimal: all packages already present."
+fi
+echo "Bootstrap (minimal) complete. Restart your shell."
+{{ else -}}
 {{ if eq .chezmoi.os "darwin" }}
 # 1. Xcode Command Line Tools
 xcode-select --install 2>/dev/null || true
@@ -68,4 +86,8 @@ export BUN_INSTALL="$HOME/.bun"; export PATH="$BUN_INSTALL/bin:$PATH"
 # 9. Global CLIs (mobile/RN)
 bun add --global eas-cli || warn "eas-cli install failed"
 {{ end }}
+#{{ if eq .role "laptop" }}
+#curl -fsSL https://github.com/zachfleeman/tasuki/raw/main/install.sh | bash
+#{{ end }}
 echo "Bootstrap complete. Restart your shell....."
+{{- end }}
