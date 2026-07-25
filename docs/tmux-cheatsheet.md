@@ -83,7 +83,8 @@ and over SSH falls back to an **OSC 52** escape sequence, so text you copy insid
 | `prefix X` | kill window (asks to confirm) |
 | `prefix b` | list copy buffers · `prefix p` paste the latest |
 
-The session name in the status bar turns **orange** whenever the prefix is active.
+The `●` dot before the session name turns **orange** whenever the prefix is active
+(aqua when idle). The bar is warm-grey locally; over SSH it's **teal, at the bottom**.
 
 ## Nested / remote sessions
 
