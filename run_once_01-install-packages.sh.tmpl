@@ -16,7 +16,7 @@ warn() { echo "WARN:  $*" >&2; }
 # Runs INSTEAD of the Homebrew path below — no brew, mise, node/ruby, uv, bun, AI CLIs.
 # Idempotent: installs only what's missing, so it is safe to re-run.
 export DEBIAN_FRONTEND=noninteractive
-pkgs="zsh tmux zsh-autosuggestions zsh-syntax-highlighting starship fzf zoxide bat eza git-delta ripgrep direnv"
+pkgs="zsh tmux zsh-autosuggestions zsh-syntax-highlighting fzf zoxide bat eza git-delta ripgrep direnv"
 missing=""
 for p in $pkgs; do
   dpkg -s "$p" >/dev/null 2>&1 || missing="$missing $p"
@@ -25,7 +25,20 @@ if [ -n "$missing" ]; then
   sudo apt-get update || die "apt-get update failed — not recording run_once so it retries."
   sudo apt-get install -y --no-install-recommends $missing || die "apt install failed:$missing"
 else
-  echo "minimal: all packages already present."
+  echo "minimal: all apt packages already present."
+fi
+
+# starship: NOT from apt. Debian trixie ships 1.22.1, which predates the [cpp]
+# module our starship.toml declares (added post-1.22) — so every login warns
+# "Unknown key 'cpp'" and drops the segment. Install upstream (latest) to
+# /usr/local/bin, which shadows any apt copy; matches the hand-fix on
+# magrathea/benjy. Guard on the upstream binary so re-runs no-op — the installer
+# always fetches latest, so its presence means a cpp-capable starship is in place.
+# Critical: the homelab verify.yml checks `starship --version`, so a failed
+# install must die() and let chezmoi retry rather than leave a plain prompt.
+if [ ! -x /usr/local/bin/starship ]; then
+  curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir /usr/local/bin \
+    || die "starship upstream install failed — not recording run_once so it retries."
 fi
 echo "Bootstrap (minimal) complete. Restart your shell."
 {{ else -}}
