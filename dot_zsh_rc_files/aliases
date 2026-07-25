@@ -16,9 +16,12 @@ alias gp='git push'
 alias gl='git pull'
 alias glog='git log --oneline --graph --decorate'
 
-# tmuxinator short command + its completion
-alias mux='tmuxinator'
-(( $+functions[compdef] )) && compdef mux=tmuxinator 2>/dev/null
+# tmuxinator short command + its completion (only if tmuxinator is installed —
+# it's not in the `minimal` package set)
+if command -v tmuxinator >/dev/null 2>&1; then
+  alias mux='tmuxinator'
+  (( $+functions[compdef] )) && compdef mux=tmuxinator 2>/dev/null
+fi
 
 # --- ls via eza (icons + git awareness) ---
 alias ls='eza --icons --group-directories-first'

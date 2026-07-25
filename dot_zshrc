@@ -9,6 +9,17 @@ if [[ -z "$HOMEBREW_PREFIX" ]]; then
   done; unset _b
 fi
 
+# --- Plugin loader: source a zsh plugin from whichever share dir has it —
+#     Homebrew's prefix first, then Debian/apt's /usr/share. Lets one config
+#     serve both brew and apt machines. Missing plugin -> quiet no-op. ---
+_source_plugin() {   # $1 = path under the share dir, e.g. foo/foo.zsh
+  local d
+  for d in "${HOMEBREW_PREFIX:-/opt/homebrew}/share" /usr/share; do
+    [[ -r "$d/$1" ]] && { source "$d/$1"; return 0; }
+  done
+  return 1
+}
+
 # --- Completion fpath (must be set BEFORE compinit runs below) ---
 # Homebrew periodically resets its share dir to group-writable, which trips zsh's
 # compinit security audit (the "insecure directories" prompt). Re-secure it each start.
@@ -64,4 +75,4 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
 # --- Syntax highlighting: MUST be sourced last ---
-source "${HOMEBREW_PREFIX:-/opt/homebrew}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" 2>/dev/null
+_source_plugin zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

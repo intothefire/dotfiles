@@ -27,14 +27,22 @@ bindkey '^[[3~' delete-char
 export CLICOLOR=1
 [[ -f "$HOME/.config/zsh/lscolors.sh" ]] && source "$HOME/.config/zsh/lscolors.sh"
 
-# --- bat (syntax-highlighted cat / pager) — matches the starship gruvbox palette ---
-export BAT_THEME="gruvbox-dark"
-export MANPAGER="sh -c 'col -bx | bat -l man -p'"   # pretty man pages
+# --- bat (syntax-highlighted cat / pager) — matches the starship gruvbox palette.
+#     Debian ships the binary as `batcat` (name clash); Homebrew as `bat`. Resolve
+#     once so MANPAGER and the fzf previews below work on both. ---
+if command -v bat >/dev/null 2>&1; then _BAT=bat
+elif command -v batcat >/dev/null 2>&1; then _BAT=batcat; alias bat='batcat'   # interactive convenience
+fi
+if [[ -n "${_BAT:-}" ]]; then
+  export BAT_THEME="gruvbox-dark"
+  export MANPAGER="sh -c 'col -bx | $_BAT -l man -p'"   # pretty man pages
+fi
 
 # --- fzf (gruvbox theme + previews) ---
 export FZF_DEFAULT_OPTS="--height 40% --layout reverse --border --color=bg+:#3c3836,bg:#282828,spinner:#fe8019,hl:#928374,fg:#ebdbb2,header:#928374,info:#8ec07c,pointer:#fe8019,marker:#fe8019,fg+:#ebdbb2,prompt:#fe8019,hl+:#fe8019"
-export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers {} 2>/dev/null || eza -1 --icons --color=always {}'"
+export FZF_CTRL_T_OPTS="--preview '${_BAT:-cat} --color=always --style=numbers {} 2>/dev/null || eza -1 --icons --color=always {}'"
 export FZF_ALT_C_OPTS="--preview 'eza -1 --icons --color=always {}'"
+unset _BAT
 
 # --- Completion styling (consulted lazily, safe to set after compinit) ---
 zstyle ':completion:*' menu select
