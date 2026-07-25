@@ -79,7 +79,7 @@ format = '[ $user ]($style)'
 
 [hostname]
 ssh_only = true                       # only shows when you're SSH'd in
-style = "bg:color_aqua fg:color_fg0"
+style = "bg:color_orange fg:color_fg0"
 format = '[@ $hostname ]($style)'
 
 [directory]
