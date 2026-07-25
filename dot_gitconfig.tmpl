@@ -1,3 +1,8 @@
+{{- /* Homebrew lives at a different prefix on Linux, so the gh credential helper
+       below cannot be hard-coded. An absolute path is used rather than a bare
+       `gh` because git runs the helper from contexts with a minimal PATH (cron,
+       Ansible, a non-login shell), where linuxbrew's bin is not on it. */ -}}
+{{- $brewPrefix := ternary "/opt/homebrew" "/home/linuxbrew/.linuxbrew" (eq .chezmoi.os "darwin") -}}
 [user]
 	email = {{ .email }}
 	name = {{ .name }}
@@ -7,10 +12,10 @@
 
 [credential "https://github.com"]
 	helper =
-	helper = !/opt/homebrew/bin/gh auth git-credential
+	helper = !{{ $brewPrefix }}/bin/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper =
-	helper = !/opt/homebrew/bin/gh auth git-credential
+	helper = !{{ $brewPrefix }}/bin/gh auth git-credential
 
 [core]
 	excludesfile = ~/.config/git/ignore
