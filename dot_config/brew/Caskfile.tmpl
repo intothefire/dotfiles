@@ -1,22 +1,28 @@
 {{- /* Homebrew casks (macOS only), templated by role. Applied by run_once_01. */ -}}
 {{- if eq .chezmoi.os "darwin" -}}
+
 {{- $laptop := eq .role "laptop" -}}
 # role = {{ .role }} — regenerated from Caskfile.tmpl.
+
+# AI
+cask "claude-code"
+cask "codex"
+cask "antigravity-cli"
+
+# security
+cask "1password"
 
 # --- CLI tools + connectivity (laptop + mac-dev) ---
 cask "1password-cli"       # provides `op`
 cask "gcloud-cli"
 cask "kiro-cli"
-cask "antigravity-cli"
 cask "tailscale-app"       # SSH over the tailnet
 
 # --- Mobile / RN toolchain (laptop + mac-dev) ---
 cask "zulu@17"             # Java for React Native / Gradle
+
 {{ if $laptop }}
 # ===== GUI apps — laptop only =====
-
-# security
-cask "1password"
 
 # AI
 cask "claude"
