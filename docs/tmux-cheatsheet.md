@@ -2,9 +2,10 @@
 
 Quick reference for this setup (config: [`dot_tmux.conf`](../dot_tmux.conf)).
 
-**The prefix is `Ctrl-b`.** Almost every command is: press `Ctrl-b`, let go, then press
+**The prefix is `Ctrl-a`.** Almost every command is: press `Ctrl-a`, let go, then press
 the next key. Written below as `prefix <key>`. The gruvbox bar along the top is how you
-know you're inside tmux.
+know you're inside tmux. (Need a literal `Ctrl-a`, e.g. jump-to-line-start in the shell?
+Press it **twice**.)
 
 > ⚠️ **Leaving vs. quitting.** To step away and keep everything running in the background,
 > **detach** with `prefix d` — *don't* type `exit`. `exit` (or `Ctrl-D`) closes a pane;
@@ -23,7 +24,8 @@ know you're inside tmux.
 | `tmux a -t work` | reattach to a named session |
 | `tmux ls` | list sessions |
 | `prefix s` | switch between sessions (interactive) |
-| `prefix $` | rename the current session |
+| `prefix R` | rename the current session |
+| `prefix D` | detach **other** clients (keep yourself attached) |
 | `tmux kill-session -t work` | kill one session |
 | `tmux kill-server` | kill everything |
 
@@ -36,7 +38,8 @@ even a **reboot**. Just `tmux attach` to get it all back.
 |---|---|
 | `prefix c` | new window (opens in the current dir) |
 | `prefix 1` … `prefix 9` | jump to window N |
-| `prefix n` · `prefix p` | next / previous window |
+| `prefix n` · `prefix p` | next / previous window (hold to repeat) |
+| `prefix Tab` | jump to the **last** window (toggle back and forth) |
 | `prefix ,` | rename window |
 | `prefix w` | pick a window from a list |
 | `prefix &` | close window |
@@ -50,7 +53,8 @@ even a **reboot**. Just `tmux attach` to get it all back.
 | `prefix h` `j` `k` `l` | move between panes (vim-style) |
 | *click a pane* | select it (mouse is on) |
 | *drag a border* | resize (mouse) |
-| `prefix z` | **zoom** a pane to fullscreen (toggle) |
+| `prefix z` · `prefix +` | **zoom** a pane to fullscreen (toggle) |
+| `prefix C-o` | rotate/swap panes around |
 | `prefix Space` | cycle through layouts |
 | `prefix x` | close pane |
 
@@ -60,26 +64,45 @@ even a **reboot**. Just `tmux attach` to get it all back.
 |---|---|
 | `prefix [` | enter copy/scroll mode (or just scroll with the mouse) |
 | `h j k l` / arrows | move around |
-| `Space` | start selection |
-| `Enter` or `y` | copy selection |
+| `v` | start selection · `C-v` toggle rectangle (block) select |
+| `y` or `Enter` | copy selection → clipboard, exit copy mode |
+| `Y` | copy the whole **line** → clipboard |
+| `D` | copy from cursor to **end of line** → clipboard |
 | `q` | quit copy mode |
+
+Copy runs through `~/.config/tmux/yank.sh`, which finds the right clipboard —
+and over SSH falls back to an **OSC 52** escape sequence, so text you copy inside a
+**remote** tmux lands in your **laptop's** clipboard. Paste anywhere with ⌘V.
 
 ## Power moves
 
 | Keys | Action |
 |---|---|
 | `F12` | toggle local keys **OFF** (status greys, shows `OFF`) so an inner / **SSH'd remote** tmux receives your keys — `F12` again to restore |
-| `y` or `Enter` *(copy mode)* | copy the selection to the **macOS clipboard** (⌘V anywhere) |
 | `prefix Q` | kill session (asks to confirm) |
 | `prefix X` | kill window (asks to confirm) |
+| `prefix b` | list copy buffers · `prefix p` paste the latest |
 
 The session name in the status bar turns **orange** whenever the prefix is active.
+
+## Nested / remote sessions
+
+When tmux runs on **both** your laptop and a box you've SSH'd into, both grab `Ctrl-a`.
+The remote tmux automatically draws its bar at the **bottom, in blue** (local stays orange
+on top) so you can always tell them apart. To drive the remote one:
+
+1. Press `F12` on the laptop → the **top** bar greys out and shows `OFF`.
+2. Your `Ctrl-a` now passes through to the **remote** tmux (the blue bar).
+3. Press `F12` again to take the laptop back.
+
+You never press `F12` on the remote — it's a local toggle for "get out of the way."
 
 ## Config
 
 | Keys | Action |
 |---|---|
 | `prefix r` | reload `~/.tmux.conf` |
+| `prefix C-e` | open `~/.tmux.conf` in `$EDITOR`, then reload on save |
 
 ## Session persistence (resurrect + continuum)
 
