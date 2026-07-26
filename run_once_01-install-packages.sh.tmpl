@@ -92,8 +92,24 @@ corepack prepare pnpm@latest --activate || true
 # 7. Python via uv
 command -v uv >/dev/null 2>&1 || curl -fsSL https://astral.sh/uv/install.sh | sh || warn "uv install failed"
 
-# 8. Bun
-command -v bun >/dev/null 2>&1 || curl -fsSL https://bun.sh/install | bash || warn "bun install failed"
+# 8. Bun — the upstream installer appends its own `# bun` block to ~/.zshrc,
+# which dot_zshrc already provides. That drift lands on a file chezmoi just
+# wrote, so the NEXT `chezmoi apply --no-tty` dies on an unanswerable overwrite
+# prompt. Snapshot the managed shell files and restore them if the installer
+# touched them — the source of truth for both lives in this repo, so discarding
+# any change it makes is always correct.
+if ! command -v bun >/dev/null 2>&1; then
+  for f in "$HOME/.zshrc" "$HOME/.zprofile"; do
+    [ -f "$f" ] && cp "$f" "$f.prebun"
+  done
+  curl -fsSL https://bun.sh/install | bash || warn "bun install failed"
+  for f in "$HOME/.zshrc" "$HOME/.zprofile"; do
+    if [ -f "$f.prebun" ]; then
+      cmp -s "$f" "$f.prebun" || cp "$f.prebun" "$f"
+      rm -f "$f.prebun"
+    fi
+  done
+fi
 export BUN_INSTALL="$HOME/.bun"; export PATH="$BUN_INSTALL/bin:$PATH"
 {{ if or (eq .role "laptop") (eq .role "mac-dev") }}
 # 9. Global CLIs (mobile/RN)
