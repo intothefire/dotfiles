@@ -63,8 +63,9 @@ eval "$(starship init zsh)"
 # --- Kiro CLI (post block — keep near the bottom) ---
 [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
 
-# --- worktrunk (needs compinit above for completions) ---
-if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+# (worktrunk lives in the fragment loop above — ~/.zsh_rc_files/wt. It was duplicated here
+# for a while; the fragment won or lost purely on source order, which is not a thing to
+# leave to chance when the failure mode is a silent no-op.)
 
 # --- bun ---
 export BUN_INSTALL="$HOME/.bun"

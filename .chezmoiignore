@@ -23,4 +23,7 @@
 # The Linux AI box (server) and the Pis (minimal) have no use for it — and benjy is a
 # disk-constrained Pi 3 where extra files have already caused an outage.
 .claude
+# worktrunk is a workstation tool (parallel agent worktrees). These boxes don't get the
+# `wt` binary from the Brewfile, so the config would be inert clutter.
+.config/worktrunk
 {{ end }}

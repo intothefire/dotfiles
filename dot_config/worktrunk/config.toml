@@ -1,0 +1,53 @@
+# worktrunk — git worktree management for parallel agent sessions.
+#
+# ⚠️ Machine-local STATE lives in this same directory and is deliberately UNMANAGED:
+#   approvals.toml        which project-hook commands you've allowed to run
+#   approvals.toml.lock
+# Approvals are a security control. Syncing them would pre-approve commands on a machine
+# where the prompt was never shown, which defeats the point. They stay per-machine.
+# For the same reason the chezmoi source dir for this must NEVER be renamed to
+# `exact_dot_config/worktrunk` — `exact_` deletes unmanaged files in the target, which
+# would wipe the approvals on every apply.
+
+# --- Where worktrees live -----------------------------------------------------------
+# Centralised (not beside the repo) and keyed by the repo's ABSOLUTE PATH.
+#
+# Why the full path rather than the two obvious alternatives — both were tested, both fail:
+#
+#   {{ repo }} alone COLLIDES. ~/Projects/productivity and ~/Projects/norman.me/productivity
+#   are different repos sharing a basename; centralising by name merges their worktrees.
+#
+#   {{ owner }} is UNDEFINED in a repo with no remote (openclaw, both productivity dirs).
+#   It does not render empty — the template fails and `wt switch` aborts outright.
+#
+# repo_path always renders and is always unique. The cost is a long directory name, which
+# is cheap: you navigate by branch (`wt switch <branch>`), not by typing these paths.
+#
+# ⚠️ This path must resolve IDENTICALLY on arthur and deep-thought. Claude Code keys its
+# session state by absolute cwd (~/.claude/projects/-Users-cnorman-Projects-…), and
+# claude-sync syncs that tree — a worktree that resolves differently per machine lands
+# under a different key and silently does not sync. Centralising the worktrees does NOT
+# by itself buy that: the template embeds the repo path, so the REPO must be cloned to the
+# same absolute path on both machines. (That is required regardless — the main checkout's
+# own session key has the same constraint.)
+worktree-path = "~/worktrees/{{ repo_path | sanitize }}/{{ branch | sanitize }}"
+
+# --- LLM commit messages ------------------------------------------------------------
+# Used by `wt merge` / `wt step commit` to write the squash message from the diff.
+# haiku + no thinking + no tools keeps it fast and cheap; this is a one-shot summariser,
+# not an agent.
+#
+# ⚠️ --setting-sources='user' loads ~/.claude/CLAUDE.md, whose writing conventions ("never
+# use first- or second-person pronouns", "refer to the human as Chris") are aimed at
+# conversation, not commit prose. If generated messages start reading oddly, drop this to
+# --setting-sources='' and rely on template-append below for house style.
+[commit.generation]
+command = "MAX_THINKING_TOKENS=0 claude -p --no-session-persistence --model=haiku --tools='' --safe-mode --setting-sources='user' --system-prompt=''"
+template-append = """
+- Use conventional commits: type(scope): summary
+- Explain WHY in the body, not just what changed
+- No trailing "Generated with" footer
+"""
+
+[list]
+json-schema = 2
