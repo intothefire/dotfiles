@@ -1,0 +1,336 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit:*)",
+      "Bash(npx nx show project:*)",
+      "Bash(mv:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx nx serve:*)",
+      "Bash(npx nx dev:*)",
+      "Bash(npx nx lint:*)",
+      "Bash(npx nx run:*)",
+      "Bash(rm:*)",
+      "Bash(npx nx typecheck:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx nx list:*)",
+      "Bash(cd:*)",
+      "Bash(cd:*)",
+      "Bash(cd:*)",
+      "Bash(npx nx reset:*)",
+      "Bash(npx nx storybook:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(yarn add:*)",
+      "Bash(npm view:*)",
+      "Bash(npx storybook@latest upgrade:*)",
+      "Bash(git stash:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm search:*)",
+      "Bash(git add:*)",
+      "WebSearch",
+      "Bash(npx nx g:*)",
+      "Bash(yarn install)",
+      "Bash(npx eslint:*)",
+      "mcp__nx-mcp__nx_workspace",
+      "mcp__nx-mcp__nx_project_details",
+      "Bash(nx test:*)",
+      "Bash(nx sync:*)",
+      "mcp__nx-mcp__nx_docs",
+      "mcp__plugin_context7_context7__get-library-docs",
+      "Bash(npx nx sync)",
+      "Bash(nx run convergent-web:lint:*)",
+      "mcp__nx-mcp__nx_workspace_path",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__nx-mcp__nx_generators",
+      "mcp__nx-mcp__nx_generator_schema",
+      "WebFetch(domain:clerk.com)",
+      "WebFetch(domain:posthog.com)",
+      "Bash(find:*)",
+      "Bash(xargs cat:*)",
+      "WebFetch(domain:upstash.com)",
+      "Bash(npx nx run-many -t typecheck --parallel=5)",
+      "Bash(npx nx run-many:*)",
+      "mcp__plugin_linear_linear__list_teams",
+      "mcp__plugin_linear_linear__list_projects",
+      "mcp__plugin_linear_linear__list_issues",
+      "mcp__plugin_linear_linear__list_issue_labels",
+      "mcp__plugin_linear_linear__list_issue_statuses",
+      "mcp__plugin_linear_linear__search_documentation",
+      "mcp__plugin_linear_linear__create_project",
+      "mcp__plugin_linear_linear__create_issue",
+      "mcp__plugin_linear_linear__update_issue",
+      "Bash(git filter-branch:*)",
+      "mcp__plugin_linear_linear__update_project",
+      "mcp__plugin_linear_linear__get_issue",
+      "Bash(gh run view:*)",
+      "Bash(git push)",
+      "Bash(git pull:*)",
+      "Bash(gh pr create --title \"fix\\(INFRA-22\\): make database safety checks conditional\" --body \"$\\(cat <<''EOF''\n## Summary\n\n- Makes database safety checks work correctly with required status checks in GitHub rulesets\n- Adds `check-paths` job using `dorny/paths-filter` to detect database file changes\n- All other jobs skip gracefully when no database files are changed\n- Skipped jobs report as \"Success\", allowing non-database PRs to merge\n\n## Problem\n\nWhen database safety checks \\(`migration-validation`, `migration-testing`, `security-analysis`\\) are required in GitHub rulesets, PRs that don''t touch database files get stuck forever waiting for status checks that will never run.\n\n## Solution\n\nBased on [GitHub Actions Required Checks for Conditional Jobs]\\(https://devopsdirective.com/posts/2025/08/github-actions-required-checks-for-conditional-jobs/\\):\n\n1. Remove path filtering from `pull_request` trigger \\(workflow now runs on all PRs\\)\n2. Add `check-paths` job that determines if database files changed\n3. All other jobs depend on `check-paths` output and skip if no database files changed\n4. Skipped jobs report \"Success\" status, satisfying required checks\n\n## Linear Issue\n\nhttps://linear.app/convergent-app/issue/INFRA-22\n\n## Test plan\n\n- [ ] This PR itself tests the fix - it doesn''t touch database files\n- [ ] Verify `check-paths` job runs and reports no database changes\n- [ ] Verify other jobs skip and report Success\n- [ ] Verify PR can be merged\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\nEOF\n\\)\")",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr create --title \"docs\\(INFRA-23\\): update CLAUDE.md with session learnings\" --body \"$\\(cat <<''EOF''\n## Summary\n\nUpdates CLAUDE.md based on session learnings:\n\n- Add commitlint body line length rule \\(max 100 chars\\)\n- Remove completed Platform Foundation initiative from pending setup\n- Note that branch protection is now enforced on main\n\n## Linear Issue\n\nhttps://linear.app/convergent-app/issue/INFRA-23\n\n## Test plan\n\n- [x] Documentation only - no code changes\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr merge:*)",
+      "Skill(optimise-claude-md)",
+      "Bash(npx nx sync --fix)",
+      "Skill(agent-os:plan-product)",
+      "Bash(cat:*)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "Bash(tree:*)",
+      "Bash(grep:*)",
+      "Bash(gh pr list:*)",
+      "Bash(git fetch:*)",
+      "Bash(gh run list:*)",
+      "WebFetch(domain:vercel.com)",
+      "Bash(npx nx test:*)",
+      "Bash(git diff:*)",
+      "Bash(tsc:*)",
+      "Bash(xargs -r git branch:*)",
+      "Bash(__NEW_LINE__ echo \"\")",
+      "Bash(xargs:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(lsof:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(curl:*)",
+      "WebFetch(domain:nx.dev)",
+      "Bash(apps/convergent-web/src/app/global.css )",
+      "Bash(apps/convergent-web/tailwind.config.js )",
+      "Bash(apps/convergent-website/src/app/global.css )",
+      "Bash(apps/convergent-website/tailwind.config.js )",
+      "Bash(apps/storybook/styles/globals.css )",
+      "Bash(apps/storybook/tailwind.config.js )",
+      "Bash(packages/ui/theme/package.json )",
+      "Bash(packages/ui/theme/src/config/tailwind-preset.js )",
+      "Bash(packages/ui/theme/src/styles/theme.css )",
+      "Bash(apps/convergent-web/next-env.d.ts )",
+      "Bash(apps/convergent-website/next-env.d.ts)",
+      "WebFetch(domain:www.nativewind.dev)",
+      "WebFetch(domain:payloadcms.com)",
+      "Bash(git branch:*)",
+      "Bash(git worktree:*)",
+      "Bash(git rebase:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(git -C /Users/cnorman/Development/Convergent/monorepo fetch origin main)",
+      "Bash(git -C /Users/cnorman/Development/Convergent/monorepo show origin/main:packages/ui/core/src/primitives/index.ts)",
+      "Bash(git -C /Users/cnorman/Development/Convergent/monorepo show origin/main:apps/convergent-website/tsconfig.json)",
+      "Bash(git -C /Users/cnorman/Development/Convergent/monorepo show origin/main:tsconfig.base.json)",
+      "WebFetch(domain:docs.slack.dev)",
+      "Bash(npx nx sync:*)",
+      "Bash(npx nx show:*)",
+      "Bash(git fsck:*)",
+      "mcp__plugin_linear_linear__create_comment",
+      "Bash(npx jest:*)",
+      "Bash(npx vitest:*)",
+      "WebFetch(domain:docs.permit.io)",
+      "WebFetch(domain:permitio.github.io)",
+      "Bash(node -e:*)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Skill(start:codebase-analysis)",
+      "Skill(start:task-delegation)",
+      "Skill(start:agentos-import)",
+      "Skill(start:specification-validation)",
+      "Skill(start:specification-management)",
+      "Skill(start:requirements-analysis)",
+      "Skill(start:architecture-design)",
+      "Skill(start:adr-management)",
+      "Skill(start:implementation-planning)",
+      "Bash(python3:*)",
+      "Bash(for adr in 0036 0053 0054 0055)",
+      "Bash(do test -f \"docs/decisions/$adr-\"*.md)",
+      "Bash(echo:*)",
+      "Bash(done)",
+      "Bash(~/.claude/plugins/cache/the-startup-cjn/start/2.9.1/skills/specification-management/spec.py 009 --read)",
+      "mcp__plugin_linear_linear__get_project",
+      "Skill(start:linear-sync)",
+      "Bash(for spec in 006 007 009 024 029 030)",
+      "Bash(do echo -n \"Spec $spec: \")",
+      "Bash(if [ -d \"docs/specs/\"*\"$spec\"* ])",
+      "Bash(then echo \"✅ EXISTS\")",
+      "Bash(else echo \"❌ NOT FOUND\")",
+      "Bash(fi)",
+      "Bash(for persona in alex casey jordan sam riley)",
+      "Bash(do echo -n \"docs/personas/$persona.md: \")",
+      "Bash(if [ -f \"docs/personas/$persona.md\" ])",
+      "Bash(if [ -f \"packages/database/channel/src/schema/index.ts\" ])",
+      "Bash(if [ -f \"apps/convergent-web/src/app/api/workflows/slack/sync-users/route.ts\" ])",
+      "Bash(if [ -f \"packages/integrations/slack/src/lib/client.ts\" ])",
+      "Bash(if [ -f \"apps/convergent-web/src/lib/server/posthog.ts\" ])",
+      "Bash(for spec in 006-github-app-integration 007-linear-integration 009-slack-integration 024-resonance-learning-system 029-vector-search-infrastructure 030-event-processing-pipeline)",
+      "Bash(if [ -f \"docs/specs/$spec/README.md\" ])",
+      "Bash(then head -15 \"docs/specs/$spec/README.md\")",
+      "Bash(~/.claude/plugins/cache/the-startup-cjn/start/2.9.1/skills/specification-management/spec.py 024 --read)",
+      "Bash(for dep in 006 007 009 029 030)",
+      "Bash(do)",
+      "Bash(if ls docs/specs/*\"$dep\"*)",
+      "Bash(then)",
+      "Bash(else)",
+      "Bash(for adr in 0027 0036)",
+      "Bash(if [ -f \"docs/decisions/$adr-\"*.md ])",
+      "Skill(start:git-workflow)",
+      "Bash(~/.claude/plugins/cache/the-startup-cjn/start/2.9.1/skills/specification-management/spec.py \"onboarding-enhancements\")",
+      "Bash(gh pr diff:*)",
+      "Bash(~/.claude/plugins/cache/the-startup-cjn/start/2.9.1/skills/specification-management/spec.py 030 --read)",
+      "Bash(__NEW_LINE__ echo -e \"\\\\n=== Checking vector search queries ===\")",
+      "Bash(__NEW_LINE__ echo -e \"\\\\n=== Checking embedding workflow ===\")",
+      "Bash(__NEW_LINE__ echo -e \"\\\\n=== Checking search API ===\")",
+      "Bash(__NEW_LINE__ echo -e \"\\\\n=== Checking backfill workflow ===\")",
+      "Bash(__NEW_LINE__ echo -e \"\\\\n=== Checking admin backfill API ===\")",
+      "Bash(__NEW_LINE__ echo -e \"\\\\n=== Checking admin dashboard ===\")",
+      "Bash(pm search:*)",
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(git mv:*)",
+      "Bash(git rm:*)",
+      "Bash(~/.claude/plugins/cache/the-startup-cjn/start/2.9.1/skills/specification-management/spec.py \"comprehensive-i18n-implementation\")",
+      "Bash(wc:*)",
+      "Bash(~/.claude/plugins/cache/the-startup-cjn/start/2.9.1/skills/specification-management/spec.py 034 --read)",
+      "Bash(yarn why:*)",
+      "Bash(for file in apps/convergent-web/src/components/team-settings/*.tsx)",
+      "Bash(do node -e \"const { parse } = require\\(''@babel/parser''\\); const fs = require\\(''fs''\\); const file = ''$file''; try { parse\\(fs.readFileSync\\(file, ''utf8''\\), { sourceType: ''module'', plugins: [''jsx'', ''typescript''] }\\); console.log\\(file + '': OK''\\); } catch\\(e\\) { console.error\\(file + '' ERROR:'', e.message\\); }\")",
+      "Bash(head:*)",
+      "Bash(cp:*)",
+      "WebFetch(domain:openrouter.ai)",
+      "Bash(doppler run:*)",
+      "Bash(npx nx build notifications)",
+      "Bash(npx nx build:*)",
+      "Skill(worktrunk:worktrunk)"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  },
+  "model": "opus[1m]",
+  "hooks": {
+{{- if .laptop }}
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/cnorman/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Waiting # notchbar-agents-claude-hook"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/cnorman/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Auto # notchbar-agents-claude-hook"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/cnorman/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' ToolFail # notchbar-agents-claude-hook"
+          }
+        ]
+      }
+    ],
+{{- end }}
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rtk hook claude"
+          }
+        ]
+      }{{ if .laptop }},
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/cnorman/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Working # notchbar-agents-claude-hook"
+          }
+        ]
+      }{{ end }}
+    ]{{ if .laptop }},
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/cnorman/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Ended # notchbar-agents-claude-hook"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/cnorman/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Idle # notchbar-agents-claude-hook"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/cnorman/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Idle # notchbar-agents-claude-hook"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/cnorman/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Working # notchbar-agents-claude-hook"
+          }
+        ]
+      }
+    ]{{ end }}
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "{{ .chezmoi.homeDir }}/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "code-simplifier@claude-plugins-official": true,
+    "hookify@claude-plugins-official": false,
+    "obsidian@obsidian-skills": false,
+    "ralph-loop@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "start@the-startup-cjn": true,
+    "superpowers@claude-plugins-official": false,
+    "team@the-startup-cjn": false,
+    "worktrunk@worktrunk": true,
+    "n8n-mcp-skills@n8n-mcp-skills": true,
+    "rust-analyzer-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "n8n-mcp-skills": {
+      "source": {
+        "source": "github",
+        "repo": "czlonkowski/n8n-skills"
+      }
+    }
+  },
+  "tui": "fullscreen",
+  "agentPushNotifEnabled": true,
+  "mcpServers": {{ if .laptop }}{
+    "life-dashboard": {
+      "args": [
+        "/Users/cnorman/Development/Home/me.norman.life-dash/packages/mcp-server/dist/index.js"
+      ],
+      "command": "node",
+      "env": {
+        "DASHBOARD_API_KEY": "internal",
+        "DASHBOARD_API_URL": "http://localhost:3000/api"
+      }
+    }
+  }{{ else }}{}{{ end }}
+}
