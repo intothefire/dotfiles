@@ -112,8 +112,9 @@ if ! command -v bun >/dev/null 2>&1; then
 fi
 export BUN_INSTALL="$HOME/.bun"; export PATH="$BUN_INSTALL/bin:$PATH"
 {{ if or (eq .role "laptop") (eq .role "mac-dev") }}
-# 9. Global CLIs (mobile/RN)
+# 9. Global CLIs (mobile/RN + Claude tooling)
 bun add --global eas-cli || warn "eas-cli install failed"
+npm install -g @tawandotorg/claude-sync || warn "claude-sync install failed"
 {{ end }}
 #{{ if eq .role "laptop" }}
 #curl -fsSL https://github.com/zachfleeman/tasuki/raw/main/install.sh | bash
