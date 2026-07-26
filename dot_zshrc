@@ -74,5 +74,17 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # --- Antigravity CLI (installed via Homebrew now; binary on /opt/homebrew/bin) ---
 export PATH="$HOME/.local/bin:$PATH"
 
+# --- claude-sync (syncs ~/.claude sessions + memory across machines) ---
+# Installed by run_once_01 on laptop/mac-dev only, via mise's node — so guard
+# BOTH halves, or shells on machines without it error on every exit.
+if command -v claude-sync >/dev/null 2>&1; then
+  # Pull in a subshell so the job is detached from the parent shell's job
+  # table — avoids interactive `[1] 12345` / `[1] + done` noise.
+  (claude-sync pull -q &) >/dev/null 2>&1
+  # Push on exit. Synchronous by design: a backgrounded push would race the
+  # shell's death and lose the session.
+  trap 'claude-sync push -q' EXIT
+fi
+
 # --- Syntax highlighting: MUST be sourced last ---
 _source_plugin zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
