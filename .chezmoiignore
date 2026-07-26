@@ -1,7 +1,9 @@
 # Repo meta-files — must NOT be deployed into $HOME.
-README.md
-CLAUDE.md
-docs
+# Anchored with a leading slash so these match ONLY ~/<name>, not any nested file of
+# the same name — an unanchored `CLAUDE.md` would also swallow ~/.claude/CLAUDE.md.
+/README.md
+/CLAUDE.md
+/docs
 .gitignore
 .idea
 {{ if eq .role "laptop" }}
@@ -15,4 +17,10 @@ docs
 .config/brew
 .config/mise
 .ssh/authorized_keys
+{{ end }}
+{{ if or (eq .role "server") (eq .role "minimal") }}
+# Agent config (~/.claude) is for the macOS workstations (laptop / mac-dev) only.
+# The Linux AI box (server) and the Pis (minimal) have no use for it — and benjy is a
+# disk-constrained Pi 3 where extra files have already caused an outage.
+.claude
 {{ end }}
