@@ -1,0 +1,55 @@
+#!/usr/bin/env {{ if eq .chezmoi.os "darwin" }}zsh{{ else }}bash{{ end }}
+#
+# Agent Vault CLI — client-side install for the macOS workstations.
+#   role = {{ .role }}   os = {{ .chezmoi.os }}
+#
+# This installs the CLI ONLY. The broker server runs on a separate host by design
+# (see ~/.zsh_rc_files/agent-vault) — nothing here starts a server, and it must not.
+#
+# Failure policy: this is a toolchain step, so it warns and continues rather than
+# blocking a machine's provisioning on it (matches run_once_01's split).
+
+warn() { echo "WARN:  $*" >&2; }
+{{ if and (eq .chezmoi.os "darwin") (or (eq .role "laptop") (eq .role "mac-dev")) -}}
+
+INSTALL_CMD="curl --proto '=https' --proto-redir '=https' --tlsv1.2 -fsSL https://get.agent-vault.dev | sh"
+
+# Resolve explicitly rather than trusting PATH: chezmoi runs scripts with its own
+# environment, which does not always carry /usr/local/bin. A bare `command -v` miss here
+# is what previously sent this script down the install path on a machine that already
+# had the binary.
+if command -v agent-vault >/dev/null 2>&1 || [ -x /usr/local/bin/agent-vault ]; then
+  echo "agent-vault already installed: $(agent-vault --version 2>/dev/null || /usr/local/bin/agent-vault --version 2>/dev/null)"
+
+# The installer writes to /usr/local/bin, which is NOT user-writable on macOS, so it
+# shells out to sudo. A password prompt inside a chezmoi run is invisible in the script's
+# captured output and reads as a hang — so this only ever installs when sudo needs no
+# password (already cached). A TTY is deliberately NOT accepted as sufficient: `chezmoi
+# apply` from a terminal has one, which is exactly the case that hung.
+elif sudo -n true 2>/dev/null; then
+  # AGENT_VAULT_NO_TELEMETRY=1 opts out of the install-time beacon (OS/arch/version).
+  # </dev/null so nothing downstream can block on stdin; --max-time bounds a stalled fetch.
+  AGENT_VAULT_NO_TELEMETRY=1 curl --proto '=https' --proto-redir '=https' --tlsv1.2 \
+    --max-time 120 -fsSL https://get.agent-vault.dev | sh </dev/null \
+    || warn "agent-vault install failed — install manually: $INSTALL_CMD"
+else
+  echo "agent-vault: not installed, and installing needs sudo (skipped so this run cannot"
+  echo "             block on a password prompt). To install, run by hand:"
+  echo "                 $INSTALL_CMD"
+fi
+
+# Login is interactive and per-machine (a long-lived session at ~/.agent-vault/session.json
+# — 1 year absolute, 30 days idle). Probe the session FILE, never the CLI: an auth-requiring
+# command can start an interactive login walkthrough, which is another way to hang a
+# provisioning run. The CA is fetched automatically by `agent-vault run`; no system-keychain
+# trust is installed, by design.
+if [ ! -f "$HOME/.agent-vault/session.json" ]; then
+  echo "agent-vault: no session on this machine. Run:  agent-vault auth login"
+  echo "             then wrap an agent with:          avc   (= agent-vault run -- claude)"
+fi
+{{- else -}}
+
+# No-op on this role/os: Agent Vault clients are the macOS workstations only
+# (laptop / mac-dev). The Linux AI box and the Pis don't run wrapped agents.
+echo "agent-vault: skipped (role={{ .role }}, os={{ .chezmoi.os }})"
+{{- end }}

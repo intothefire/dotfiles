@@ -39,14 +39,15 @@ powerlevel10k. Behaviour that oh-my-zsh used to provide lives in explicit fragme
 `dot_zsh_rc_files/` (→ `~/.zsh_rc_files/`), sourced by `.zshrc` in this order:
 
 ```
-core  plugins  aliases  nvm  wt  path        (+ commands/life-admin)
+core  plugins  aliases  mise  wt  path  agent-vault       (+ commands/ai)
 ```
 
 - `core` — history, options, keybindings, completion styling, LS_COLORS
 - `plugins` — `zsh-autosuggestions` + `zsh-you-should-use` (brew); `zsh-syntax-highlighting`
   is sourced **last** directly in `.zshrc` (it must load after everything else)
 - `aliases` — curated git shell aliases
-- `nvm` / `wt` / `path` — node version manager, worktrunk integration, PATH additions
+- `mise` / `wt` / `path` — runtime version manager, worktrunk integration, PATH additions
+- `agent-vault` — credential-broker client env + `avc`/`av` wrappers (see below)
 
 compinit runs once in `.zshrc` (brew completions fpath is set before it). Tool-managed blocks
 (OpenSpec, Kiro CLI pre/post, bun, Antigravity) are kept in `.zshrc` as-is.
@@ -62,6 +63,36 @@ API keys. 1Password is the intended source of truth:
 - **Env-var API keys** (Voyage, Linear, Infisical, openclaw) → `op read`, or the local file.
 
 Never put a real secret in a tracked file.
+
+## Agent Vault (credential broker for AI agents)
+
+[Agent Vault](https://docs.agent-vault.dev) brokers credentials so an agent never holds a real
+secret: the agent calls upstream APIs normally and the broker's transparent proxy injects the
+credential in flight.
+
+- **The server is NOT managed here.** It already runs on a separate host, reached over
+  Tailscale. That separation is the security property — a broker on the same machine as the
+  agent sits in a filesystem the agent can read. These dotfiles configure **clients only**;
+  nothing here starts a server.
+- **Broker URL is committed** in `dot_zsh_rc_files/agent-vault` (a plain fragment, not a
+  template). It is not a credential — reaching it still requires tailnet membership. This was
+  chosen over a chezmoi prompt so a new mac needs no manual step; the trade is that the tailnet
+  name is public. Do not reintroduce an `agentvaultaddr` prompt: `.chezmoi.toml.tmpl` uses
+  plain `promptString`, so touching that file makes **every** value re-prompt on `chezmoi init`.
+- `run_once_04-install-agent-vault.sh.tmpl` installs the CLI on `laptop`/`mac-dev` only, via the
+  upstream script (no brew formula exists). It warns rather than dies, and skips when sudo
+  isn't available non-interactively so an unattended apply can't hang on a password prompt.
+- **Login is interactive and per-machine**: `agent-vault auth login`. Not automatable.
+- Wrap an agent with `avc` (= `agent-vault run -- claude`) or `av <agent>`. `claude` is
+  deliberately **not** shadowed — `agent-vault run` aborts when the broker is unreachable, so
+  aliasing it would break the agent whenever Tailscale is down. One-line flip in the fragment.
+- No MITM root is installed into the system keychain. `agent-vault run` sets the CA-trust vars
+  on the child process only; system-wide trust would expose every browser and app on the Mac.
+- `agent-vault run` also writes `~/.claude/skills/agent-vault-cli/SKILL.md`. It is tool-managed
+  and rewritten on launch — do **not** version it (same reasoning as the plugin ledgers).
+
+`vault run` is a wrapper, **not** a sandbox: a child can unset `HTTPS_PROXY` and reach the
+network directly. It removes credentials from the agent's reach; it does not contain the agent.
 
 ## Homebrew
 
