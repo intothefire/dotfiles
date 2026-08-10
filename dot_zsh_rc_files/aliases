@@ -28,3 +28,6 @@ alias ls='eza --icons --group-directories-first'
 alias ll='eza --icons --group-directories-first -lh --git'
 alias la='eza --icons --group-directories-first -lah --git'
 alias lt='eza --icons --tree --level=2'
+
+# --- worktrunk ---
+alias wtc='wt switch -c -x claude'
