@@ -1,0 +1,53 @@
+# Agent Vault — a credential broker for AI agents (https://docs.agent-vault.dev).
+#
+# The point: the agent never holds a real secret. It calls upstream APIs normally;
+# the broker's transparent proxy intercepts the call and injects the credential.
+# If an agent is prompt-injected into exfiltrating its keys, it has none to leak.
+#
+# Topology matters. The broker runs on a SEPARATE host, reached over Tailscale —
+# that separation IS the security property. A broker on this machine would sit in
+# the same filesystem the agent can read, which defeats the whole design. Nothing
+# in these dotfiles starts a server, and nothing should.
+#
+# The URL is committed deliberately. It is not a credential: reaching it still
+# requires membership of the tailnet. Chris chose this over a chezmoi prompt so a
+# new mac needs no manual step.
+
+export AGENT_VAULT_ADDR="https://agent-vault.tail8749b.ts.net"
+
+# Opt out of the anonymous usage beacon.
+export AGENT_VAULT_TELEMETRY=false
+
+if command -v agent-vault >/dev/null 2>&1; then
+  # `agent-vault run` sets HTTPS_PROXY/HTTP_PROXY/NO_PROXY/NODE_USE_ENV_PROXY and the
+  # CA-trust vars (SSL_CERT_FILE, NODE_EXTRA_CA_CERTS, REQUESTS_CA_BUNDLE,
+  # CURL_CA_BUNDLE, GIT_SSL_CAINFO, DENO_CERT) on the CHILD ONLY, pointing at
+  # ~/.agent-vault/mitm-ca.pem. Nothing is added to the system keychain — deliberately.
+  # A system-wide MITM root would be trusted by every browser and app on the Mac, which
+  # is a far larger blast radius than the problem being solved.
+  av() {
+    if (( $# == 0 )); then
+      print -u2 "usage: av <agent> [args...]   e.g. av claude"
+      return 2
+    fi
+    agent-vault run -- "$@"
+  }
+
+  alias avc='agent-vault run -- claude'
+
+  # `auth login` is the ONE command that ignores AGENT_VAULT_ADDR: it opens a "hosting
+  # selection" TUI first, and its --address flag defaults to http://127.0.0.1:14321.
+  # Passing --address explicitly skips that prompt and goes straight to email/password.
+  alias avlogin='agent-vault auth login --address "$AGENT_VAULT_ADDR"'
+
+  # NOT shadowing `claude` by default, on purpose. `agent-vault run` aborts when the
+  # broker's proxy is unreachable, so aliasing `claude` would make the agent unusable
+  # whenever Tailscale is down or you're offline. Uncomment to go fully default-on and
+  # accept that trade:
+  # alias claude='agent-vault run -- claude'
+
+  # ⚠️ `run` is a wrapper, not a sandbox — the docs are explicit about this. A child can
+  # unset HTTPS_PROXY or ignore the injected CA and reach the network directly, and it
+  # still has your local files and network. It removes the credentials from the agent's
+  # reach; it does not contain the agent. For real containment see `--isolation=container`.
+fi
