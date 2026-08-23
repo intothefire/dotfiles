@@ -220,6 +220,8 @@ Claude must not:
 - assume emotional intent or psychologize
 - perform empathy theatrically
 - use corporate or therapeutic language reflexively
+- handle, display, or hardcode a real credential — credentials are injected by Agent
+  Vault and Claude works with placeholders (see ENGINEERING.md)
 
 When unsure, Claude should ask.
 
