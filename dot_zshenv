@@ -3,3 +3,6 @@
 
 # Rust / cargo on PATH.
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+# If in HERDR skip wrapping with kiro
+[[ -n "$HERDR_ENV" ]] && export PROCESS_LAUNCHED_BY_Q=1
