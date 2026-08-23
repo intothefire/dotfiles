@@ -1,0 +1,175 @@
+#!/bin/sh
+# ~/.claude/settings.json — chezmoi `modify_` script, NOT a plain template.
+#
+# settings.json has several writers: Chris, Claude Code itself (plugin toggles,
+# defaultMode, autoMode), and third-party installers (Bartender/NotchBar, herdr).
+# A plain template loses that race on every `chezmoi apply`. This script instead
+# receives the CURRENT file on stdin and emits the merged result on stdout, so
+# only the keys named below are chezmoi's to own.
+#
+#   ENFORCE  — chezmoi is authoritative; asserted on every apply
+#   PRESERVE — anything not named here passes through untouched (the DEFAULT)
+#   PURGE    — hook entries matching a dead-tool pattern are stripped every apply
+#
+# Note the source filename: `modify_` MUST come before `private_`. Reversed
+# (`private_modify_...`) chezmoi deploys a literal file called
+# `modify_private_settings.json` and silently does nothing useful.
+set -eu
+
+current=$(cat)
+[ -n "$current" ] || current='{}'
+
+# ---- ENFORCE ---------------------------------------------------------------
+# Portable policy only. Nothing machine-specific belongs in here.
+policy=$(cat <<'POLICY'
+{
+  "model": "opus[1m]",
+  "statusLine": {
+    "type": "command",
+    "command": "{{ .chezmoi.homeDir }}/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "code-simplifier@claude-plugins-official": true,
+    "hookify@claude-plugins-official": false,
+    "security-guidance@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": false,
+    "worktrunk@worktrunk": true,
+    "n8n-mcp-skills@n8n-mcp-skills": true,
+    "rust-analyzer-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "n8n-mcp-skills": {
+      "source": {
+        "source": "github",
+        "repo": "czlonkowski/n8n-skills"
+      }
+    }
+  },
+  "tui": "fullscreen",
+  "agentPushNotifEnabled": true
+}
+POLICY
+)
+
+# Permission floors. Unioned into whatever is on disk, so a permission granted
+# locally via /permissions survives an apply while these stay guaranteed.
+perms=$(cat <<'PERMS'
+{
+  "allow": [
+    "Bash(gh pr checks:*)",
+    "Bash(gh pr create:*)",
+    "Bash(gh pr diff:*)",
+    "Bash(gh pr merge:*)",
+    "Bash(gh pr view:*)",
+    "Bash(gh run view:*)",
+    "Bash(git commit:*)",
+    "Bash(git mv:*)",
+    "Bash(git pull:*)",
+    "Bash(git push:*)",
+    "Bash(git rm:*)",
+    "Bash(npx nx build:*)",
+    "Skill(worktrunk:worktrunk)"
+  ],
+  "ask": [
+    "Bash(git push *--force*)",
+    "Bash(git push -f *)",
+    "Bash(git push *-f)"
+  ],
+  "deny": [
+    "Bash(*--no-verify*)",
+    "Bash(*--no-hooks*)",
+    "Bash(*--no-pre-commit-hook*)"
+  ]
+}
+PERMS
+)
+
+# ---- ENFORCE: autoMode.environment ----------------------------------------
+# Authored as readable markdown in docs/claude-auto-mode-environment.md and
+# inlined here at template-render time. One array entry per line; blank lines
+# and whole-line HTML comments are dropped, so the source file can carry its
+# own header. `autoMode.soft_deny` is NOT touched — it stays in PRESERVE.
+# Base64, deliberately. A quoted heredoc looks like the obvious way to embed
+# this, but bash does NOT respect one inside $( ): an apostrophe in the body
+# still terminates the substitution, and the source document is full of them
+# (Chris's, Komodo's). Base64 has no shell-special characters, so the markdown
+# can contain anything without breaking this script.
+env_md=$(printf '%s' '{{ include "docs/claude-auto-mode-environment.md" | b64enc }}' | base64 -d)
+
+# ---- PURGE -----------------------------------------------------------------
+# Hook commands matching these regexes are deleted on every apply. Orca and
+# Superset were dropped as products; this makes their removal durable rather
+# than a one-time cleanup, in case either installer ever runs again.
+dead='["\\.orca/agent-hooks", "SUPERSET_HOME_DIR"]'
+
+merged=$(printf '%s' "$current" | jq \
+  --argjson policy "$policy" \
+  --argjson perms "$perms" \
+  --argjson dead "$dead" \
+  --arg env_md "$env_md" '
+
+  # NOTE: this jq program sits inside a single-quoted shell string. An
+  # apostrophe anywhere below (even in a comment) terminates it and breaks
+  # the script. Write "does not", never "doesn" + apostrophe + "t".
+
+  # Append-only union: keeps the on-disk order and appends whatever is
+  # missing. Deliberately not `unique`, which re-sorts — whether order matters
+  # within a permission category is unverified, so do not depend on it.
+  def union($base; $add): $base + ($add - $base);
+
+  # NB: `any($dead[]; $c | test(.))` is WRONG — after `$c |` the `.` inside
+  # test() rebinds to $c, so every command tests against itself and matches.
+  # Capture the pattern in $p first.
+  def is_dead($c): reduce ($dead[]) as $p (false; . or ($c | test($p)));
+
+  # PURGE: drop dead hook entries, then any group and event left empty.
+  (if .hooks then
+     .hooks |= (
+       with_entries(
+         .value |= (
+           map(.hooks |= map(select(is_dead(.command) | not)))
+           | map(select((.hooks | length) > 0))
+         )
+       )
+       | with_entries(select((.value | length) > 0))
+     )
+   else . end)
+
+  # ENFORCE: deep merge. Objects merge key-wise, so unlisted keys (autoMode,
+  # permissions.defaultMode, locally-enabled plugins) are PRESERVED.
+  | . * $policy
+
+  # ENFORCE: permission floors, unioned so local grants survive.
+  | .permissions = ((.permissions // {})
+      | .allow = union((.allow // []); $perms.allow)
+      | .ask   = union((.ask   // []); $perms.ask)
+      | .deny  = union((.deny  // []); $perms.deny))
+
+  # ENFORCE: autoMode.environment from the markdown source. Replaced wholesale
+  # (chezmoi is authoritative); soft_deny and any other autoMode key survive.
+  | .autoMode = ((.autoMode // {})
+      | .environment = (
+          $env_md
+          | split("\n")
+          | map(select((test("^\\s*$") | not) and (test("^\\s*<!--") | not)))))
+
+  # ENFORCE: rtk PreToolUse hook, upserted by identity so the array is never
+  # replaced — Bartender and herdr entries in PreToolUse stay put.
+  | .hooks = (.hooks // {})
+  | .hooks.PreToolUse = ((.hooks.PreToolUse // [])
+      | if any(.[]; any(.hooks[]?; .command == "rtk hook claude")) then .
+        else . + [{
+          "matcher": "Bash",
+          "hooks": [{"type": "command", "command": "rtk hook claude"}]
+        }] end)
+') || merged=''
+# jq's stderr is deliberately NOT swallowed: a silent fall-through to the
+# unchanged file looks identical to "nothing to do" and hid a real bug once.
+
+# Fail-safe: never emit a truncated or invalid file. If jq failed for any
+# reason, hand back exactly what was on disk.
+if [ -n "$merged" ]; then
+  printf '%s\n' "$merged"
+else
+  printf '%s' "$current"
+fi

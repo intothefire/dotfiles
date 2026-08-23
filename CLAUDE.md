@@ -91,8 +91,69 @@ credential in flight.
 - `agent-vault run` also writes `~/.claude/skills/agent-vault-cli/SKILL.md`. It is tool-managed
   and rewritten on launch — do **not** version it (same reasoning as the plugin ledgers).
 
+The **agent-facing** rule — Claude never holds a real credential, works with placeholders,
+and raises a proposal on 401/403 — lives in `dot_claude/ENGINEERING.md` (§ Secrets and
+Credentials), with a one-line ban in `dot_claude/CLAUDE.md`. It is also injected into
+`autoMode.environment` so auto-mode risk assessment knows it. This section stays about
+*client setup*; that one is about *agent behaviour*.
+
 `vault run` is a wrapper, **not** a sandbox: a child can unset `HTTPS_PROXY` and reach the
 network directly. It removes credentials from the agent's reach; it does not contain the agent.
+
+## Claude Code config (`~/.claude`) — a file with several writers
+
+chezmoi owns config only: `CLAUDE.md`, `ENGINEERING.md`, `RTK.md`, `statusline.sh`, `skills/`,
+and `settings.json`. Session state (`projects/`, `history.jsonl`, `tasks`, `plans`) belongs to
+**claude-sync**; the two tools must never own the same path.
+
+`settings.json` is deployed by `modify_private_settings.json.tmpl` — a chezmoi **`modify_`
+script**, not a plain template. It receives the current file on stdin and emits the merged
+result, because several things write to it: Chris, Claude Code itself (plugin toggles,
+`permissions.defaultMode`, `autoMode`), and third-party installers (Bartender/NotchBar, herdr).
+A plain template lost that race and clobbered them on every apply. Three zones:
+
+- **ENFORCE** — `model`, `statusLine`, `enabledPlugins`, `extraKnownMarketplaces`, `tui`,
+  `agentPushNotifEnabled`, the `rtk` PreToolUse hook, and the `permissions` allow/ask/deny
+  floors. Permissions are **unioned**, so a grant made locally via `/permissions` survives;
+  the listed entries are guaranteed present. The rtk hook is upserted by identity so the
+  `PreToolUse` array is never replaced.
+- **PRESERVE** — the default. Anything not named passes through: Bartender's hooks, herdr's
+  `SessionStart` hook, `autoMode`'s generated environment block, `permissions.defaultMode`,
+  and whatever a future tool injects. Bartender therefore needs **no** `{{ if .laptop }}`
+  guard — it injects its own hooks wherever it is installed, so a mac mini simply never
+  gets them.
+- **PURGE** — hook commands matching `\.orca/agent-hooks` or `SUPERSET_HOME_DIR` are stripped
+  on every apply. Orca and Superset were dropped as products; this keeps their removal
+  durable if either installer ever runs again.
+
+`autoMode.environment` is authored as readable markdown in
+`docs/claude-auto-mode-environment.md` and injected by the same script: one array entry per
+line, with blank lines and whole-line HTML comments stripped so the file can carry its own
+header. `docs/` is `.chezmoiignore`d, so the markdown itself never lands in `$HOME`. Edit the
+markdown, then `chezmoi diff ~/.claude/settings.json`. `autoMode.soft_deny` is deliberately
+left in PRESERVE. Remember this key is **user-level** — it applies in every repo, so it must
+never say "this repo".
+
+Gotchas, all verified the hard way:
+
+- `modify_` must come **before** `private_` in the filename. Reversed, chezmoi silently
+  deploys a literal file named `modify_private_settings.json` and does nothing useful.
+- The script falls back to emitting stdin unchanged if `jq` fails, so a broken filter can
+  never truncate `settings.json`. jq's stderr is deliberately **not** swallowed — a silent
+  fall-through is indistinguishable from "nothing to do" and once hid a real bug.
+- Apostrophes are a recurring hazard. The jq filter lives in a single-quoted shell string, so
+  one in a *comment* breaks it. And bash does **not** respect a quoted heredoc inside `$( )` —
+  an apostrophe in the body still terminates the substitution. That is why the markdown is
+  embedded via `b64enc` / `base64 -d` rather than a heredoc: base64 has no shell-special
+  characters, so the document can contain anything.
+
+**Tool-managed, deliberately not versioned** (same reasoning as the agent-vault `SKILL.md`):
+`hooks/herdr-agent-state.sh` is written by herdr and overwritten whenever the integration
+updates — the Brewfile manages the `herdr` formula, herdr manages its own hook and its
+`settings.json` entry. `plugins/installed_plugins.json` and `plugins/known_marketplaces.json`
+are stateful ledgers (absolute paths, timestamps, `gitCommitSha`) that Claude Code rewrites on
+every plugin op; the declarative enabled-set lives in `settings.json` instead. Cost: a fresh
+machine needs a manual `/plugin` install pass.
 
 ## Homebrew
 
