@@ -11,7 +11,6 @@
 # --- Taps ---
 tap "anomalyco/tap"
 tap "dopplerhq/doppler"
-tap "max-sixty/worktrunk"
 tap "openclaw/tap"
 tap "steipete/tap"
 {{ if $mac }}tap "scouzi1966/afm"
@@ -47,7 +46,7 @@ brew "jq"
 brew "pandoc"
 brew "gnupg"
 brew "mkcert"
-brew "max-sixty/worktrunk/wt"
+brew "worktrunk"
 {{ if $mac }}brew "automake"         # mac build deps (Linux uses build-essential)
 brew "libtool"
 brew "pkgconf"
@@ -59,6 +58,7 @@ brew "libyaml"
 # AI / agents
 brew "anomalyco/tap/opencode"
 brew "rtk"
+brew "herdr"          # agent multiplexer; installs its own ~/.claude hook (not chezmoi-managed)
 brew "openclaw/tap/gogcli"
 {{ if $mac }}brew "scouzi1966/afm/afm"   # Apple Foundation Models — macOS only
 {{ end }}
