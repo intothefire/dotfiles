@@ -1,9 +1,13 @@
 # Repo meta-files — must NOT be deployed into $HOME.
-# Anchored with a leading slash so these match ONLY ~/<name>, not any nested file of
-# the same name — an unanchored `CLAUDE.md` would also swallow ~/.claude/CLAUDE.md.
-/README.md
-/CLAUDE.md
-/docs
+#
+# These were once written as `/README.md` etc. chezmoi 2.72.0 rejects a leading slash
+# outright ("invalid path") and refuses to run at all, so the anchoring had to go.
+# Verified against 2.72.0: a bare pattern still ignores only the root-level target —
+# `CLAUDE.md` here does NOT swallow ~/.claude/CLAUDE.md, which continues to deploy.
+# Re-check that if these files ever gain a nested namesake in the source tree.
+README.md
+CLAUDE.md
+docs
 .gitignore
 .idea
 {{ if eq .role "laptop" }}

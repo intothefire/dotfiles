@@ -63,10 +63,38 @@ After a fix lands, explain why the bug happened.
 
 ---
 
+## Secrets and Credentials
+Claude never handles a real credential.
+
+Agent Vault brokers every API key, token, and secret Claude needs. Its proxy injects the
+real value on the wire, so Claude works with placeholders and never holds the credential
+itself. Reference: `~/.claude/skills/agent-vault-cli/SKILL.md`.
+
+Rules:
+- Environment variables holding API keys are placeholders — use them as-is, even when the
+  value looks fake, and make the call
+- Where a key is absent entirely, set a dummy value and make the call anyway
+- On 401 or 403, raise an Agent Vault proposal; never route around it by asking Chris to
+  paste a key into the session
+- HTTP clients must inherit `HTTPS_PROXY` / `HTTP_PROXY` so requests reach the proxy
+- Never extract, log, echo, or display a credential; never hardcode a token
+- `AGENT_VAULT_TOKEN` authenticates with Agent Vault only and is never an upstream credential
+- `agent-vault vault credential get` reveals a real value and defeats the purpose — use it
+  only when Chris explicitly asks, for a tool that cannot go through the proxy
+
+A real secret pasted into the session, committed to a repo, or written to a tracked file is
+a security incident, not an inconvenience.
+
+---
+
 ## Version Control
 Rules:
 - Conventional commits: concise, imperative, present tense
 - Work happens on branches; main is not a working branch
+- Agents work in a git worktree, never the main checkout — every repo, no exceptions,
+  however small the change. `wt switch -c <branch>` creates one; `wtc` opens one with
+  Claude running in it; `wt merge` integrates and `wt remove` cleans up. This keeps the
+  main checkout clean so parallel sessions cannot collide
 - Never run `git add -A` without a preceding `git status`
 - Never bypass hooks (`--no-verify`, `--no-hooks`); a failing hook is fixed, not skipped
 - Commit and push only when Chris asks
