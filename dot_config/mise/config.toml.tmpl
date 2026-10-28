@@ -1,7 +1,18 @@
 # mise global tool versions (github.com/jdx/mise). Per-project overrides via
 # .mise.toml / .tool-versions in a repo.
+#
+# Exact pins so every machine gets identical versions; bump by hand.
+# The JS package managers live here, not corepack: Node 25+ no longer bundles
+# corepack. pnpm still honours a project's `packageManager` field, and Yarn 4
+# repos use their committed yarnPath.
 [tools]
-node = "latest"
+node = "24.22.1"
+npm = "12.2.1"
+pnpm = "12.16.1"
+"aqua:yarnpkg/berry" = "4.18.1"
 {{ if or (eq .role "laptop") (eq .role "mac-dev") -}}
 ruby = "4.0.6"
+# Rust via rustup (mise drives it; toolchains still live in ~/.rustup, binaries
+# in ~/.cargo/bin). rust-analyzer backs the rust-analyzer-lsp Claude plugin.
+rust = { version = "1.99.1", components = ["rust-src", "rust-analyzer"] }
 {{ end -}}
