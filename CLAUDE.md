@@ -165,7 +165,7 @@ share one app — uninstalling either token removes the app; verify the target b
 ## Provisioning (run_once, in order)
 
 1. `run_once_01-install-packages.sh.tmpl` — Homebrew → trust taps → `brew bundle` →
-   **mise** (Node + Ruby 4.0.6, via its config) → corepack (Yarn 4 + pnpm) → uv → bun →
+   **mise** (exact pins for Node, npm, pnpm, Yarn 4 + Ruby 4.0.6; no corepack) → uv → bun →
    eas. Critical steps (brew install, `brew bundle`) fail loud so chezmoi retries;
    toolchain steps warn. Role/os-gated; no RVM/nvm.
 2. `run_once_02-configure-mac.sh.tmpl` — macOS `defaults`. Carries `FIX:`/`FLAG:` comments

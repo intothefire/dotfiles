@@ -6,7 +6,7 @@
 #
 # Failure policy: CRITICAL steps (Homebrew, brew bundle) call die() -> non-zero
 # exit, so chezmoi does NOT record run_once as complete and WILL retry. Fragile
-# but non-essential steps (Ruby build, corepack, eas) warn and continue. This
+# but non-essential steps (Ruby build, eas) warn and continue. This
 # script must never exit 0 on a broken foundation.
 
 die()  { echo "FATAL: $*" >&2; exit 1; }
@@ -77,17 +77,13 @@ brew bundle --file="$HOME/.config/brew/Caskfile" || die "brew bundle (Caskfile) 
 {{- end }}
 # From here: idempotent toolchain — warn but don't fail the box on benign errors.
 
-# 4. Node + Ruby via mise (versions from ~/.config/mise/config.toml — ruby is
-#    gated to mac dev machines there). No rvm, no GPG signature dance.
+# 4. Node, npm, pnpm, Yarn + Ruby via mise (exact pins in
+#    ~/.config/mise/config.toml — ruby is gated to mac dev machines there).
+#    No rvm, no corepack, no GPG signature dance.
 if command -v mise >/dev/null 2>&1; then
-  mise install || warn "mise install (node/ruby) had errors"
+  mise install || warn "mise install (node/npm/pnpm/yarn/ruby) had errors"
   eval "$(mise activate bash)" 2>/dev/null || true
 fi
-
-# 6. JS package managers via corepack
-corepack enable || true
-corepack prepare yarn@stable --activate || true    # Yarn 4.x
-corepack prepare pnpm@latest --activate || true
 
 # 7. Python via uv
 command -v uv >/dev/null 2>&1 || curl -fsSL https://astral.sh/uv/install.sh | sh || warn "uv install failed"
