@@ -77,12 +77,20 @@ brew bundle --file="$HOME/.config/brew/Caskfile" || die "brew bundle (Caskfile) 
 {{- end }}
 # From here: idempotent toolchain — warn but don't fail the box on benign errors.
 
-# 4. Node, npm, pnpm, Yarn + Ruby via mise (exact pins in
-#    ~/.config/mise/config.toml — ruby is gated to mac dev machines there).
+# 4. Node, npm, pnpm, Yarn + Ruby, Rust via mise (exact pins in
+#    ~/.config/mise/config.toml — ruby/rust are gated to mac dev machines there).
 #    No rvm, no corepack, no GPG signature dance.
 if command -v mise >/dev/null 2>&1; then
-  mise install || warn "mise install (node/npm/pnpm/yarn/ruby) had errors"
+  mise install || warn "mise install (node/npm/pnpm/yarn/ruby/rust) had errors"
   eval "$(mise activate bash)" 2>/dev/null || true
+{{- if or (eq .role "laptop") (eq .role "mac-dev") }}
+  # Make the mise-pinned Rust the rustup default too, so shells, scripts and
+  # IDE builds that never load mise get the same toolchain. Version is read
+  # from the mise config, not repeated here.
+  if command -v rustup >/dev/null 2>&1; then
+    rustup default "$(mise current rust)" || warn "rustup default failed"
+  fi
+{{- end }}
 fi
 
 # 7. Python via uv
