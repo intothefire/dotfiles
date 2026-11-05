@@ -83,7 +83,10 @@ credential in flight.
   upstream script (no brew formula exists). It warns rather than dies, and skips when sudo
   isn't available non-interactively so an unattended apply can't hang on a password prompt.
 - **Login is interactive and per-machine**: `agent-vault auth login`. Not automatable.
-- Wrap an agent with `avc` (= `agent-vault run -- claude`) or `av <agent>`. `claude` is
+- Wrap an agent with `avc` (= `agent-vault run --vault claude -- claude`) or `av <agent>`.
+  `avc` defaults to the `claude` vault, skipping the run picker; `--vault <name>` (or
+  `--vault=<name>`) anywhere before a literal `--` overrides it, and every other arg goes
+  to claude. It is a function, not an alias. `claude` is
   deliberately **not** shadowed — `agent-vault run` aborts when the broker is unreachable, so
   aliasing it would break the agent whenever Tailscale is down. One-line flip in the fragment.
 - No MITM root is installed into the system keychain. `agent-vault run` sets the CA-trust vars

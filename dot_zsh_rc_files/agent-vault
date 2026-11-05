@@ -36,7 +36,46 @@ if command -v agent-vault >/dev/null 2>&1; then
     agent-vault run -- "$@"
   }
 
-  alias avc='agent-vault run -- claude'
+  # `avc` runs claude scoped to the `claude` vault, skipping the `agent-vault run`
+  # picker. `--vault <name>` or `--vault=<name>` overrides it from anywhere in the args
+  # (claude has no --vault of its own); everything else, and all args after a literal
+  # `--`, passes through to claude untouched. Re-sourcing in a shell that still has the
+  # old `avc` alias: `function avc {` is never alias-expanded (`avc() {` would be, and
+  # fail to parse), and the unalias stops the stale alias shadowing the function.
+  unalias avc 2>/dev/null
+  function avc {
+    local vault=claude
+    local -a rest
+    while (( $# )); do
+      case $1 in
+        --)
+          rest+=("$@")
+          break
+          ;;
+        --vault)
+          if (( $# < 2 )); then
+            print -u2 "usage: avc [--vault <name>] [claude args...]   (default vault: claude)"
+            return 2
+          fi
+          vault=$2
+          shift 2
+          continue
+          ;;
+        --vault=*)
+          vault=${1#--vault=}
+          if [[ -z $vault ]]; then
+            print -u2 "usage: avc [--vault <name>] [claude args...]   (default vault: claude)"
+            return 2
+          fi
+          ;;
+        *)
+          rest+=("$1")
+          ;;
+      esac
+      shift
+    done
+    agent-vault run --vault "$vault" -- claude "${rest[@]}"
+  }
 
   # `auth login` is the ONE command that ignores AGENT_VAULT_ADDR: it opens a "hosting
   # selection" TUI first, and its --address flag defaults to http://127.0.0.1:14321.
