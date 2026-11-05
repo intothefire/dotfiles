@@ -78,10 +78,11 @@ brew bundle --file="$HOME/.config/brew/Caskfile" || die "brew bundle (Caskfile) 
 # From here: idempotent toolchain — warn but don't fail the box on benign errors.
 
 # 4. Node, npm, pnpm, Yarn + Ruby, Rust via mise (exact pins in
-#    ~/.config/mise/config.toml — ruby/rust are gated to mac dev machines there).
+#    ~/.config/mise/config.toml — ruby/rust/claude-sync are gated to mac dev
+#    machines there).
 #    No rvm, no corepack, no GPG signature dance.
 if command -v mise >/dev/null 2>&1; then
-  mise install || warn "mise install (node/npm/pnpm/yarn/ruby/rust) had errors"
+  mise install || warn "mise install (node/npm/pnpm/yarn/ruby/rust/claude-sync) had errors"
   eval "$(mise activate bash)" 2>/dev/null || true
 {{- if or (eq .role "laptop") (eq .role "mac-dev") }}
   # Make the mise-pinned Rust the rustup default too, so shells, scripts and
@@ -116,9 +117,8 @@ if ! command -v bun >/dev/null 2>&1; then
 fi
 export BUN_INSTALL="$HOME/.bun"; export PATH="$BUN_INSTALL/bin:$PATH"
 {{ if or (eq .role "laptop") (eq .role "mac-dev") }}
-# 9. Global CLIs (mobile/RN + Claude tooling)
+# 9. Global CLIs (mobile/RN). claude-sync is a mise tool now (step 4).
 bun add --global eas-cli || warn "eas-cli install failed"
-npm install -g @tawandotorg/claude-sync || warn "claude-sync install failed"
 {{ end }}
 #{{ if eq .role "laptop" }}
 #curl -fsSL https://github.com/zachfleeman/tasuki/raw/main/install.sh | bash

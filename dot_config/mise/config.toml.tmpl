@@ -15,4 +15,8 @@ ruby = "4.0.6"
 # Rust via rustup (mise drives it; toolchains still live in ~/.rustup, binaries
 # in ~/.cargo/bin). rust-analyzer backs the rust-analyzer-lsp Claude plugin.
 rust = { version = "1.99.1", components = ["rust-src", "rust-analyzer"] }
+# claude-sync (syncs ~/.claude session state) from its GitHub release binaries,
+# not npm: the npm package is a wrapper whose postinstall fetches the binary,
+# and npm 12 skips install scripts by default, leaving no binary behind.
+"github:tawanorg/claude-sync" = "1.17.2"
 {{ end -}}
