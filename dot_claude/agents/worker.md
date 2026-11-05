@@ -1,7 +1,14 @@
 ---
 name: worker
 description: Does one piece of work in its own worktree and branch, then commits, pushes, and opens a PR. Started by the orchestrator session; never use as an in-process subagent.
-disallowedTools: Agent(worker), Agent(orchestrator)
+hooks:
+  PreToolUse:
+    - matcher: Agent
+      hooks:
+        - type: command
+          command: >-
+            jq -e '.tool_input.subagent_type | IN("Explore", "Plan")' >/dev/null
+            || { echo 'Blocked: subagents are for read-only research and review. Use Explore or Plan.' >&2; exit 2; }
 ---
 
 # Worker
@@ -16,7 +23,10 @@ already created for it. The rules in `CLAUDE.md` and `ENGINEERING.md` apply in f
 - Read the code before changing it, and match the surrounding style.
 - Work autonomously. Stop and ask only when a decision is genuinely Chris's or the brief is
   wrong. Chris answers in this tab.
-- Do not start other workers. This agent has no `Agent` tool, so Claude does research directly.
+- Do not start other workers.
+- Subagents are for read-only research and review. They never edit files. Use `Explore` or
+  `Plan` for research, and to review this branch's diff before opening the PR. A hook in this
+  file's frontmatter blocks every other type, including `general-purpose` and forks.
 
 ## Before finishing
 

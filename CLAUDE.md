@@ -168,6 +168,19 @@ live in `dot_claude/ENGINEERING.md`; their auto-mode copy is in
 `docs/claude-auto-mode-environment.md`, so change both together. Add specialist workers as
 new files once a role needs different instructions.
 
+Both agents may use subagents, but only the read-only `Explore` and `Plan` types. A
+`PreToolUse` hook on `Agent` in each file's frontmatter enforces this as an allowlist: it
+denies any other `subagent_type`, including `general-purpose`, `claude`, plugin agents, and
+forks (which carry no type). Two mechanisms that look right do not work:
+
+- `disallowedTools: Agent(x)` removes the **whole** `Agent` tool, not one type. That is why
+  the agents had no `Agent` tool at all when the field read `Agent(worker), Agent(orchestrator)`.
+- `tools: Agent(Explore, Plan)` is a real allowlist, but `tools` restricts the entire toolset,
+  so every built-in and MCP server would have to be listed by hand.
+
+Claude Code skips frontmatter hooks for an agent whose file is in an untrusted folder. The
+deployed agents are user-scoped (`~/.claude/agents/`), so this only affects tests.
+
 The `post-start` hook in `.config/wt.toml` opens WebStorm on each new worktree for review. It
 must be committed: a new worktree contains only committed files, so a staged hook never runs.
 
