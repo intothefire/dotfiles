@@ -18,6 +18,9 @@ export AGENT_VAULT_ADDR="https://agent-vault.tail8749b.ts.net"
 # Opt out of the anonymous usage beacon.
 export AGENT_VAULT_TELEMETRY=false
 
+export NO_PROXY="${NO_PROXY:+$NO_PROXY,}my.1password.com"
+export no_proxy="$NO_PROXY"
+
 if command -v agent-vault >/dev/null 2>&1; then
   # `agent-vault run` sets HTTPS_PROXY/HTTP_PROXY/NO_PROXY/NODE_USE_ENV_PROXY and the
   # CA-trust vars (SSL_CERT_FILE, NODE_EXTRA_CA_CERTS, REQUESTS_CA_BUNDLE,

@@ -1,5 +1,9 @@
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/emulator
 export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$HOME/.herdr-projects/data/bin
 
 export PATH="$HOME/.claude/plugins/marketplaces/the-startup-cjn/plugins/start/scripts:$PATH"
+
+export PROTO_HOME="$HOME/.proto"
+export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
