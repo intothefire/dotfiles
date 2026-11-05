@@ -50,10 +50,6 @@ done
 for cmd in "$ZSH_RC_FILES"/commands/*(N.); do source "$cmd"; done
 unset ZSH_RC_FILES cmd
 
-# --- 1Password shell plugins (biometric-gated CLI auth) ---
-# Configure per CLI with `op plugin init gh` (etc.). Harmless until one exists.
-[[ -f "$HOME/.config/op/plugins.sh" ]] && source "$HOME/.config/op/plugins.sh"
-
 # --- Java ---
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
 

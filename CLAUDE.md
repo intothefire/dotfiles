@@ -58,8 +58,8 @@ Secrets live in `~/.config/.secrets` (mode 600, gitignored, **not** chezmoi-mana
 `.zshrc` sources it early. It holds `OP_SERVICE_ACCOUNT_TOKEN` (the 1Password bootstrap) plus
 API keys. 1Password is the intended source of truth:
 
-- **CLI auth** (gh, vercel, npm, cargo, brew) → 1Password **shell plugins**. `.zshrc` sources
-  `~/.config/op/plugins.sh`; configure per-CLI with `op plugin init <tool>` (interactive).
+- **CLI auth** (gh, vercel, npm, cargo, brew) → each tool's own login, such as `gh auth login`.
+  1Password shell plugins were removed: they failed whenever `op` lost the desktop app.
 - **Env-var API keys** (Voyage, Linear, Infisical, openclaw) → `op read`, or the local file.
 
 Never put a real secret in a tracked file.
