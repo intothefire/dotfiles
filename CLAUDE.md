@@ -103,7 +103,7 @@ network directly. It removes credentials from the agent's reach; it does not con
 ## Claude Code config (`~/.claude`) — a file with several writers
 
 chezmoi owns config only: `CLAUDE.md`, `ENGINEERING.md`, `RTK.md`, `statusline.sh`, `skills/`,
-and `settings.json`. Session state (`projects/`, `history.jsonl`, `tasks`, `plans`) belongs to
+`agents/`, and `settings.json`. Session state (`projects/`, `history.jsonl`, `tasks`, `plans`) belongs to
 **claude-sync**; the two tools must never own the same path.
 
 `settings.json` is deployed by `modify_private_settings.json.tmpl` — a chezmoi **`modify_`
@@ -154,6 +154,19 @@ updates — the Brewfile manages the `herdr` formula, herdr manages its own hook
 are stateful ledgers (absolute paths, timestamps, `gitCommitSha`) that Claude Code rewrites on
 every plugin op; the declarative enabled-set lives in `settings.json` instead. Cost: a fresh
 machine needs a manual `/plugin` install pass.
+
+## Orchestrator and worker agents
+
+`dot_claude/agents/` deploys `orchestrator` and `worker` to `~/.claude/agents/`. Chris starts
+`avc --agent orchestrator`; it starts each worker as a full session in its own Herdr tab and
+worktree. An agent's body replaces Claude Code's default system prompt, while `CLAUDE.md`
+still loads, so the agent files must carry their own working instructions. The workflow rules
+live in `dot_claude/ENGINEERING.md`; their auto-mode copy is in
+`docs/claude-auto-mode-environment.md`, so change both together. Add specialist workers as
+new files once a role needs different instructions.
+
+The `post-start` hook in `.config/wt.toml` opens WebStorm on each new worktree for review. It
+must be committed: a new worktree contains only committed files, so a staged hook never runs.
 
 ## Homebrew
 
