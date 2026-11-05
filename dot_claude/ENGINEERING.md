@@ -91,13 +91,19 @@ a security incident, not an inconvenience.
 Rules:
 - Conventional commits: concise, imperative, present tense
 - Work happens on branches; main is not a working branch
-- Agents work in a git worktree, never the main checkout — every repo, no exceptions,
-  however small the change. `wt switch -c <branch>` creates one; `wtc` opens one with
-  Claude running in it; `wt merge` integrates and `wt remove` cleans up. This keeps the
-  main checkout clean so parallel sessions cannot collide
+- In a git repo, the main session plans and delegates. Anything beyond planning and markdown
+  planning documents is done by a worker session in its own worktree and branch, however
+  small the change. `~/.claude/agents/orchestrator.md` has the steps. This standing rule is
+  the explicit request for a new Herdr tab and worktree. Outside Herdr, Claude prints the
+  command for Chris to run
+- Sessions start with `avc --agent orchestrator`. Workers run under Agent Vault when the
+  orchestrator does, and never fall back to plain `claude` when the broker is unreachable
+- Hook approvals belong to Chris: Claude never approves a worktrunk hook or passes `--yes`
+  or `--no-hooks` to `wt`
 - Never run `git add -A` without a preceding `git status`
 - Never bypass hooks (`--no-verify`, `--no-hooks`); a failing hook is fixed, not skipped
-- Commit and push only when Chris asks
+- Commit and push only when Chris asks. Exception: a worker that has finished its brief
+  commits, pushes, and opens a PR without asking. Merging stays with Chris
 
 Time pressure is never justification for skipping a quality check.
 

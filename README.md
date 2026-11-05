@@ -19,7 +19,7 @@ laptop?), and applies everything: shell config, Homebrew packages, macOS default
 - **Provisioning** — `run_once_*` scripts: Homebrew + toolchains (Ruby, Node, Yarn 4/pnpm/bun,
   eas-cli), macOS `defaults`, and the Dock.
 - **Secrets** — never committed. Live in `~/.config/.secrets` (gitignored); 1Password is the
-  source of truth (shell plugins for CLIs, `op read` for env-var keys).
+  source of truth (`op read` for env-var keys).
 
 ## Day-to-day
 
