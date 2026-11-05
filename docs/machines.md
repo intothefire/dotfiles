@@ -47,6 +47,6 @@ Linux support is built and Mac-verified (Mac renders/behaviour unchanged). On a 
 
 ### Validate on the first real box
 - custom-tap formulae have Linux bottles? (`opencode`, `rtk`, `wt`, `gogcli` — `afm` is
-  mac-only and already gated out)
+  gated out: it installs only on macOS 26 Tahoe or later, read from `sw_vers` at render time)
 - Homebrew-on-Linux installs cleanly (needs `sudo` for the `apt` prereqs once)
 - clipboard over SSH behaves as expected (OSC 52 vs local xclip)

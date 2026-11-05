@@ -2,6 +2,12 @@
 {{- $laptop := eq .role "laptop" -}}
 {{- $macdev := eq .role "mac-dev" -}}
 {{- $mac := eq .chezmoi.os "darwin" -}}
+{{- /* afm needs macOS 26 Tahoe+; it does not run on 15 Sequoia (the mac mini).
+       chezmoi has no macOS version variable, so ask sw_vers — darwin only. */ -}}
+{{- $afm := false -}}
+{{- if $mac -}}
+{{-   $afm = ge (output "sw_vers" "-productVersion" | trim | splitList "." | first | atoi) 26 -}}
+{{- end -}}
 {{- $mobile := or (eq .role "laptop") (eq .role "mac-dev") -}}
 # ===================================================================
 #  role = {{ .role }}   os = {{ .chezmoi.os }}
@@ -13,7 +19,7 @@ tap "anomalyco/tap"
 tap "dopplerhq/doppler"
 tap "openclaw/tap"
 tap "steipete/tap"
-{{ if $mac }}tap "scouzi1966/afm"
+{{ if $afm }}tap "scouzi1966/afm"
 {{ end }}
 # ===== Core — every machine =====
 
@@ -59,7 +65,7 @@ brew "anomalyco/tap/opencode"
 brew "rtk"
 brew "herdr"          # agent multiplexer; installs its own ~/.claude hook (not chezmoi-managed)
 brew "openclaw/tap/gogcli"
-{{ if $mac }}brew "scouzi1966/afm/afm"   # Apple Foundation Models — macOS only
+{{ if $afm }}brew "scouzi1966/afm/afm"   # Apple Foundation Models — macOS only
 {{ end }}
 # secrets
 brew "doppler"
