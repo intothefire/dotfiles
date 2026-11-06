@@ -5,6 +5,17 @@
 # The JS package managers live here, not corepack: Node 25+ no longer bundles
 # corepack. pnpm still honours a project's `packageManager` field, and Yarn 4
 # repos use their committed yarnPath.
+
+# Idiomatic version files: let mise honour a repo's rust-toolchain.toml (rust) and
+# .node-version / .nvmrc (node) instead of the global pins below. This is how moon
+# workspaces get their own toolchain in the interactive shell: .moon/toolchains.yml is
+# the source of truth, moon writes rust-toolchain.toml from it (rust.syncToolchainConfig),
+# and mise reads that. moon's own tasks still run through proto. Node has no moon sync —
+# a workspace that wants a node pin in the shell commits .node-version by hand. Off by
+# default in mise; any other tool keeps ignoring its idiomatic file.
+[settings]
+idiomatic_version_file_enable_tools = ["node", "rust"]
+
 [tools]
 node = "24.22.1"
 npm = "12.2.1"

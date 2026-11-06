@@ -41,7 +41,7 @@ powerlevel10k. Behaviour that oh-my-zsh used to provide lives in explicit fragme
 ```
 core  plugins  aliases  wt  path  agent-vault  (+ commands/ai)
   … Java, starship, Kiro post, bun, ~/.local/bin …
-mise  moon                                     (after the last static PATH edit)
+mise                                           (after the last static PATH edit)
 ```
 
 - `core` — history, options, keybindings, completion styling, LS_COLORS
@@ -51,7 +51,6 @@ mise  moon                                     (after the last static PATH edit)
 - `wt` / `path` — worktrunk integration, static PATH additions (incl. `PROTO_HOME` and
   `~/.proto/shims:~/.proto/bin`)
 - `mise` — global toolchain manager; `mise activate` hooks precmd + chpwd
-- `moon` — puts a moon workspace's pinned toolchain ahead of mise (see below)
 - `agent-vault` — credential-broker client env + `avc`/`av` wrappers (see below)
 
 compinit runs once in `.zshrc` (brew completions fpath is set before it), so any brew formula
@@ -63,39 +62,54 @@ its `compinit` is now the plain, unmarked one. OpenSpec itself is installed by t
 ### Toolchains: mise global, proto per moon workspace
 
 - **mise** is the global toolchain manager (`dot_config/mise/config.toml.tmpl`). Its pins win
-  everywhere outside a moon workspace.
-- **proto** is used only inside **moon** workspaces, which pin toolchains in
-  `.moon/toolchains.yml`. moon is the standard monorepo tool. proto and moon live in
-  `~/.proto`, installed by `run_once_05`.
-- proto does **not** read `.moon/toolchains.yml`; only moon does, for the tasks it runs. So
-  in a workspace, a bare `node` would get mise's version, and proto's shim fails with
-  "failed to detect an applicable version". The `moon` fragment bridges this. Its
-  precmd/chpwd hook finds the nearest `.moon/toolchains.yml`. For each toolchain with a
-  `version:` it exports `PROTO_<ID>_VERSION` and puts `~/.proto/shims` first on PATH. For
-  `rust` it also sets `RUSTUP_TOOLCHAIN` and puts `~/.cargo/bin` (the rustup proxies) first.
-  mise's rustc/cargo shims force mise's own toolchain whatever `RUSTUP_TOOLCHAIN` says, so
-  they must not win in a workspace. Leaving the workspace undoes all of it.
+  everywhere unless a repo carries an idiomatic version file mise is told to read.
+- **moon** is the standard monorepo tool. A moon workspace pins its toolchains in
+  `.moon/toolchains.yml`, which stays the source of truth. moon's own tasks install and run
+  those versions through **proto**. proto and moon live in `~/.proto`, installed by
+  `run_once_05`. proto does not read `toolchains.yml`, and its shims fail outside moon tasks
+  with "failed to detect an applicable version", so the interactive shell does not use proto
+  for node or rust.
+- **The interactive shell gets a workspace's versions through mise's idiomatic version
+  files.** The mise config sets `idiomatic_version_file_enable_tools = ["node", "rust"]`
+  (off by default in mise). With it, mise reads:
+
+  | tool | file mise reads | who keeps it in sync with `toolchains.yml` |
+  |------|-----------------|--------------------------------------------|
+  | rust | `rust-toolchain.toml` | moon, with `rust.syncToolchainConfig: true` |
+  | node | `.node-version`, `.nvmrc` | **nobody**: commit it by hand |
+
+Caveats, all verified against moon 2.6.5 and mise 2026.11.3:
+
+- **Only node and rust are covered.** They are the only toolchains these workspaces pin.
+  Another tool needs its own entry in the setting, and only works if mise supports an
+  idiomatic file for it.
+- **moon never writes a node version file.** `node.syncVersionManagerConfig` (`nodenv` /
+  `nvm`) is deprecated in moon 2. The node toolchain docs say it "never worked correctly"
+  and "has no effect"; a scratch workspace confirmed no file is written. A workspace whose
+  node pin should apply in the shell commits `.node-version` itself and keeps it equal to
+  `toolchains.yml` by hand. Without one, the shell gets mise's global node.
+- **`rust-toolchain.toml` refreshes only when moon sets up the rust toolchain**, i.e. when a
+  rust task runs. `moon sync` does **not** rewrite it. moon also only updates an existing file:
+  if it is missing, the rust task fails reading it, so create it once.
+- Rust is resolved by rustup (mise's rust uses rustup toolchains). mise exports
+  `RUSTUP_TOOLCHAIN` from the version it resolves, so the file has to be one mise reads.
 
 PATH precedence, highest first:
 
 ```
-in a moon workspace:  ~/.cargo/bin (if rust pinned)  ~/.proto/shims
-everywhere:           mise tools  ~/.local/bin  bun  ~/.proto/shims  ~/.proto/bin  brew …
+mise tools  ~/.local/bin  bun  ~/.proto/shims  ~/.proto/bin  brew …
 ```
 
-Why the order is what it is (verified with `whence -p node rustc cargo moon`):
+Why `mise` is sourced late (verified with `whence -p node rustc cargo moon`):
 
-- **mise re-prepends its dirs** on every prompt and every `cd`. A static `PATH=` edit can
-  never beat it at a prompt, so the workspace override has to be a hook registered
-  **after** mise's (zsh runs hooks in registration order). That is why `moon` follows `mise`.
+- **mise re-prepends its dirs** on every prompt and every `cd`, so at a prompt it beats any
+  static `PATH=` edit.
 - **Shells that never draw a prompt** (`zsh -i -c`, agent tool shells) get only mise's
   first pass at activation. Anything prepended after that wins there. `mise` used to be
   sourced early, so `~/.local/bin` (added later in `.zshrc`) won, and `node` resolved to
   `~/.local/bin/node`. That is a symlink to Hermes's private Node 22, written by the Hermes
-  agent installer, not mise's pin. So `mise` + `moon` are sourced after the last static PATH
-  edit. A new PATH line in `.zshrc` goes **above** that block.
-- The `moon` hook re-reads `toolchains.yml` only when the workspace root changes. After
-  editing it, `cd` out and back in.
+  agent installer, not mise's pin. So `mise` is sourced after the last static PATH edit. A
+  new PATH line in `.zshrc` goes **above** that block.
 
 ## Secrets (never committed)
 

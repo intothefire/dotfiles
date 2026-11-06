@@ -4,8 +4,9 @@
 #   role = {{ .role }}   os = {{ .chezmoi.os }}
 #
 # mise stays the GLOBAL toolchain manager (dot_config/mise). proto is only for moon
-# workspaces, which pin their toolchains in .moon/toolchains.yml; ~/.zsh_rc_files/moon
-# puts those versions ahead of mise inside a workspace.
+# workspaces, which pin their toolchains in .moon/toolchains.yml; moon's tasks run those
+# versions through proto. (The interactive shell gets them from mise's idiomatic version
+# files instead — see dot_config/mise/config.toml.tmpl.)
 #
 # Why the upstream installer and not the brew formulae: proto manages itself in
 # ~/.proto (`proto upgrade` rewrites ~/.proto/bin/proto, which would fight a brew-owned
