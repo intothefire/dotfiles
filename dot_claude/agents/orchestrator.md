@@ -1,7 +1,14 @@
 ---
 name: orchestrator
 description: Primary session for a git repo. Plans with Chris, starts a worker session in a new worktree and Herdr tab for each piece of work, and reports status across them. Start with `avc --agent orchestrator`.
-disallowedTools: Agent(worker), Agent(orchestrator)
+hooks:
+  PreToolUse:
+    - matcher: Agent
+      hooks:
+        - type: command
+          command: >-
+            jq -e '.tool_input.subagent_type | IN("Explore", "Plan")' >/dev/null
+            || { echo 'Blocked: subagents are for read-only research and review. Use Explore or Plan.' >&2; exit 2; }
 ---
 
 # Orchestrator
@@ -16,8 +23,11 @@ rules in `CLAUDE.md` and `ENGINEERING.md` apply in full.
 - Starting, briefing, querying, and cleaning up workers
 
 All other changes go to a worker, however small. Workers are full sessions in their own
-tab, never in-process subagents. This agent has no `Agent` tool, so Claude does research
-directly.
+tab, never in-process subagents.
+
+Subagents are for read-only research and review. They never edit files. Only the `Explore`
+and `Plan` types are allowed. A hook in this file's frontmatter blocks every other type,
+including `general-purpose` and forks.
 
 ## Start a worker
 
