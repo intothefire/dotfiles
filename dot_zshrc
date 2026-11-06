@@ -28,12 +28,9 @@ if [[ -n "$HOMEBREW_PREFIX" && -d "$HOMEBREW_PREFIX/share" ]]; then
   fpath=("$HOMEBREW_PREFIX/share/zsh/site-functions" "$HOMEBREW_PREFIX/share/zsh-completions" $fpath)
 fi
 
-# OPENSPEC:START
-# OpenSpec shell completions configuration
-fpath=("$HOME/.oh-my-zsh/custom/completions" $fpath)
+# --- Completion init (the single compinit; fragments below rely on it) ---
 autoload -Uz compinit
 compinit
-# OPENSPEC:END
 
 # --- Machine-local secrets (gitignored; NOT in the dotfiles repo) ---
 # See ~/.config/.secrets. Holds OP_SERVICE_ACCOUNT_TOKEN + API keys.

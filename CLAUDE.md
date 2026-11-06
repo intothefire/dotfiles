@@ -49,8 +49,11 @@ core  plugins  aliases  mise  wt  path  agent-vault       (+ commands/ai)
 - `mise` / `wt` / `path` — runtime version manager, worktrunk integration, PATH additions
 - `agent-vault` — credential-broker client env + `avc`/`av` wrappers (see below)
 
-compinit runs once in `.zshrc` (brew completions fpath is set before it). Tool-managed blocks
-(OpenSpec, Kiro CLI pre/post, bun, Antigravity) are kept in `.zshrc` as-is.
+compinit runs once in `.zshrc` (brew completions fpath is set before it), so any brew formula
+that ships a zsh completion (e.g. `openspec`) is picked up with no extra wiring. Tool-managed
+blocks (Kiro CLI pre/post, bun, Antigravity) are kept in `.zshrc` as-is. The old
+`# OPENSPEC:START/END` block was removed: it pointed fpath at the deleted oh-my-zsh tree, and
+its `compinit` is now the plain, unmarked one. OpenSpec itself is installed by the Brewfile.
 
 ## Secrets (never committed)
 
