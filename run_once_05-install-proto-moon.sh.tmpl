@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+#
+# proto + moon — per-repo toolchains for moon monorepos, on the macOS workstations.
+#   role = {{ .role }}   os = {{ .chezmoi.os }}
+#
+# mise stays the GLOBAL toolchain manager (dot_config/mise). proto is only for moon
+# workspaces, which pin their toolchains in .moon/toolchains.yml; moon's tasks run those
+# versions through proto. (The interactive shell gets them from mise's idiomatic version
+# files instead — see dot_config/mise/config.toml.tmpl.)
+#
+# Why the upstream installer and not the brew formulae: proto manages itself in
+# ~/.proto (`proto upgrade` rewrites ~/.proto/bin/proto, which would fight a brew-owned
+# binary), and moon repos pin moon's version through proto, which a brew `moon` on PATH
+# would bypass. Install one way only — do not add `proto`/`moon` to the Brewfile.
+#
+# Exact pins so every machine matches; bump by hand (which also re-runs this script).
+#
+# Failure policy: a toolchain step, so it warns and continues rather than blocking a
+# machine's provisioning (matches run_once_01 / run_once_04). Everything lands in the
+# user's home, so no sudo and no password prompt can hang the run.
+
+warn() { echo "WARN:  $*" >&2; }
+{{ if and (eq .chezmoi.os "darwin") (or (eq .role "laptop") (eq .role "mac-dev")) -}}
+
+PROTO_VERSION="0.63.1"
+MOON_VERSION="2.6.5"
+
+# Pin the home explicitly: the installer falls back to $XDG_DATA_HOME/proto when
+# PROTO_HOME is unset, which would not match the PATH set in ~/.zsh_rc_files/path.
+export PROTO_HOME="$HOME/.proto"
+PROTO="$PROTO_HOME/bin/proto"
+
+INSTALL_CMD="curl -fsSL https://moonrepo.dev/install/proto.sh | bash -s -- $PROTO_VERSION --yes --no-modify-profile --no-modify-path"
+
+# `proto --version` prints "proto X.Y.Z". A different version (an older install, or a pin
+# bump) gets reinstalled at the pin; `proto upgrade` would ignore the pin.
+CURRENT="$("$PROTO" --version 2>/dev/null | awk '{print $2}')"
+if [ "$CURRENT" = "$PROTO_VERSION" ]; then
+  echo "proto $PROTO_VERSION already installed"
+else
+  [ -n "$CURRENT" ] && echo "proto $CURRENT installed; switching to pinned $PROTO_VERSION"
+  # Download to a file, then run it — not `curl | bash`: a failed download would pipe an
+  # empty script into bash, which exits 0 and hides the failure; and in bash, adding
+  # </dev/null to `bash -s` replaces the piped script, so nothing runs at all.
+  # --yes: no prompts. --no-modify-profile / --no-modify-path: the shell fragments own
+  # PATH; the installer must not append its own block to ~/.zshrc (chezmoi-managed).
+  # </dev/null so nothing can block on stdin; --max-time bounds a stalled script fetch.
+  INSTALLER="$(mktemp -t proto-install)" || INSTALLER=""
+  if [ -n "$INSTALLER" ] \
+    && curl --proto '=https' --proto-redir '=https' --tlsv1.2 --max-time 120 \
+         -fsSL https://moonrepo.dev/install/proto.sh -o "$INSTALLER" \
+    && bash "$INSTALLER" "$PROTO_VERSION" --yes --no-modify-profile --no-modify-path </dev/null; then
+    :
+  else
+    warn "proto install failed — install manually: $INSTALL_CMD"
+  fi
+  [ -n "$INSTALLER" ] && rm -f "$INSTALLER"
+fi
+
+if [ -x "$PROTO" ]; then
+  # --pin global writes ~/.proto/.prototools, so `moon` works outside any repo (e.g.
+  # `moon init`). A repo's own .prototools still overrides it inside that repo.
+  "$PROTO" install moon "$MOON_VERSION" --pin global --yes </dev/null \
+    || warn "moon install failed — run by hand:  proto install moon $MOON_VERSION --pin global"
+else
+  warn "proto is not installed, so moon was skipped"
+fi
+{{- else -}}
+
+# No-op on this role/os: moon development happens on the macOS workstations only
+# (laptop / mac-dev).
+echo "proto/moon: skipped (role={{ .role }}, os={{ .chezmoi.os }})"
+{{- end }}

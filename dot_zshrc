@@ -40,12 +40,13 @@ compinit
 [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
 
 # --- Shell config fragments (order matters) ---
+# mise is NOT in this loop: it is sourced further down, after the last static PATH edit
+# (see "Toolchain manager" below).
 ZSH_RC_FILES="$HOME/.zsh_rc_files"
-for frag in core plugins aliases mise wt path agent-vault; do
+for frag in core plugins aliases wt path agent-vault; do
   [[ -f "$ZSH_RC_FILES/$frag" ]] && source "$ZSH_RC_FILES/$frag"
 done
 for cmd in "$ZSH_RC_FILES"/commands/*(N.); do source "$cmd"; done
-unset ZSH_RC_FILES cmd
 
 # --- Java ---
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
@@ -67,6 +68,17 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # --- Antigravity CLI (installed via Homebrew now; binary on /opt/homebrew/bin) ---
 export PATH="$HOME/.local/bin:$PATH"
+
+# --- Toolchain manager: MUST come after every static PATH edit above ---
+# mise activation prepends its tool dirs once now and again on every prompt/cd. Shells
+# that never draw a prompt (`zsh -i -c`, agent tool shells) only get the first pass, so
+# anything prepended after it wins there: ~/.local/bin/node (Hermes's node 22) used to
+# shadow mise's node that way. Precedence, highest first:
+#   mise tools > ~/.local/bin > bun > proto shims/bin > the rest
+# Inside a moon workspace mise itself picks the repo's versions from its idiomatic version
+# files (rust-toolchain.toml, .node-version/.nvmrc) — see dot_config/mise/config.toml.tmpl.
+[[ -f "$ZSH_RC_FILES/mise" ]] && source "$ZSH_RC_FILES/mise"
+unset ZSH_RC_FILES cmd
 
 # --- claude-sync (syncs ~/.claude sessions + memory across machines) ---
 # Installed by mise (github backend) on laptop/mac-dev only — so guard

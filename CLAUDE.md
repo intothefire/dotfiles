@@ -39,14 +39,18 @@ powerlevel10k. Behaviour that oh-my-zsh used to provide lives in explicit fragme
 `dot_zsh_rc_files/` (→ `~/.zsh_rc_files/`), sourced by `.zshrc` in this order:
 
 ```
-core  plugins  aliases  mise  wt  path  agent-vault       (+ commands/ai)
+core  plugins  aliases  wt  path  agent-vault  (+ commands/ai)
+  … Java, starship, Kiro post, bun, ~/.local/bin …
+mise                                           (after the last static PATH edit)
 ```
 
 - `core` — history, options, keybindings, completion styling, LS_COLORS
 - `plugins` — `zsh-autosuggestions` + `zsh-you-should-use` (brew); `zsh-syntax-highlighting`
   is sourced **last** directly in `.zshrc` (it must load after everything else)
 - `aliases` — curated git shell aliases
-- `mise` / `wt` / `path` — runtime version manager, worktrunk integration, PATH additions
+- `wt` / `path` — worktrunk integration, static PATH additions (incl. `PROTO_HOME` and
+  `~/.proto/shims:~/.proto/bin`)
+- `mise` — global toolchain manager; `mise activate` hooks precmd + chpwd
 - `agent-vault` — credential-broker client env + `avc`/`av` wrappers (see below)
 
 compinit runs once in `.zshrc` (brew completions fpath is set before it), so any brew formula
@@ -54,6 +58,58 @@ that ships a zsh completion (e.g. `openspec`) is picked up with no extra wiring.
 blocks (Kiro CLI pre/post, bun, Antigravity) are kept in `.zshrc` as-is. The old
 `# OPENSPEC:START/END` block was removed: it pointed fpath at the deleted oh-my-zsh tree, and
 its `compinit` is now the plain, unmarked one. OpenSpec itself is installed by the Brewfile.
+
+### Toolchains: mise global, proto per moon workspace
+
+- **mise** is the global toolchain manager (`dot_config/mise/config.toml.tmpl`). Its pins win
+  everywhere unless a repo carries an idiomatic version file mise is told to read.
+- **moon** is the standard monorepo tool. A moon workspace pins its toolchains in
+  `.moon/toolchains.yml`, which stays the source of truth. moon's own tasks install and run
+  those versions through **proto**. proto and moon live in `~/.proto`, installed by
+  `run_once_05`. proto does not read `toolchains.yml`, and its shims fail outside moon tasks
+  with "failed to detect an applicable version", so the interactive shell does not use proto
+  for node or rust.
+- **The interactive shell gets a workspace's versions through mise's idiomatic version
+  files.** The mise config sets `idiomatic_version_file_enable_tools = ["node", "rust"]`
+  (off by default in mise). With it, mise reads:
+
+  | tool | file mise reads | who keeps it in sync with `toolchains.yml` |
+  |------|-----------------|--------------------------------------------|
+  | rust | `rust-toolchain.toml` | moon, with `rust.syncToolchainConfig: true` |
+  | node | `.node-version`, `.nvmrc` | **nobody**: commit it by hand |
+
+Caveats, all verified against moon 2.6.5 and mise 2026.11.3:
+
+- **Only node and rust are covered.** They are the only toolchains these workspaces pin.
+  Another tool needs its own entry in the setting, and only works if mise supports an
+  idiomatic file for it.
+- **moon never writes a node version file.** `node.syncVersionManagerConfig` (`nodenv` /
+  `nvm`) is deprecated in moon 2. The node toolchain docs say it "never worked correctly"
+  and "has no effect"; a scratch workspace confirmed no file is written. A workspace whose
+  node pin should apply in the shell commits `.node-version` itself and keeps it equal to
+  `toolchains.yml` by hand. Without one, the shell gets mise's global node.
+- **`rust-toolchain.toml` refreshes only when moon sets up the rust toolchain**, i.e. when a
+  rust task runs. `moon sync` does **not** rewrite it. moon also only updates an existing file:
+  if it is missing, the rust task fails reading it, so create it once.
+- Rust is resolved by rustup (mise's rust uses rustup toolchains). mise exports
+  `RUSTUP_TOOLCHAIN` from the version it resolves, so the file has to be one mise reads.
+
+PATH precedence, highest first:
+
+```
+mise tools  ~/.local/bin  bun  ~/.proto/shims  ~/.proto/bin  brew …
+```
+
+Why `mise` is sourced late (verified with `whence -p node rustc cargo moon`):
+
+- **mise re-prepends its dirs** on every prompt and every `cd`, so at a prompt it beats any
+  static `PATH=` edit.
+- **Shells that never draw a prompt** (`zsh -i -c`, agent tool shells) get only mise's
+  first pass at activation. Anything prepended after that wins there. `mise` used to be
+  sourced early, so `~/.local/bin` (added later in `.zshrc`) won, and `node` resolved to
+  `~/.local/bin/node`. That is a symlink to Hermes's private Node 22, written by the Hermes
+  agent installer, not mise's pin. So `mise` is sourced after the last static PATH edit. A
+  new PATH line in `.zshrc` goes **above** that block.
 
 ## Secrets (never committed)
 
@@ -204,6 +260,13 @@ share one app — uninstalling either token removes the app; verify the target b
    from a 2026 review pass; some blocks (Mail, Terminal.app) are no-ops for this setup.
 3. `run_once_03-configure-dock.sh.tmpl` — rebuilds the Dock via `dockutil`. JetBrains apps
    resolve at stable `~/Applications/*.app` Toolbox paths.
+4. `run_once_04-install-agent-vault.sh.tmpl` — Agent Vault CLI (see Agent Vault above).
+5. `run_once_05-install-proto-moon.sh.tmpl` — proto's official installer into `~/.proto`
+   (`--yes --no-modify-profile --no-modify-path`: the fragments own PATH), then
+   `proto install moon <pin> --pin global` so `moon` works outside a repo. Exact pins, bump
+   by hand. laptop/mac-dev only. Warns rather than dies, needs no sudo. Not the brew
+   formulae: proto self-upgrades in `~/.proto`, and a brew `moon` would bypass a repo's
+   proto-pinned moon version. Do not install both ways.
 
 `run_after_change-update-tower-plist.sh` writes the current `$PATH` into Git Tower's env plist.
 
