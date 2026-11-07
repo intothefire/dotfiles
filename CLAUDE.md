@@ -165,7 +165,7 @@ network directly. It removes credentials from the agent's reach; it does not con
 ## Claude Code config (`~/.claude`) — a file with several writers
 
 chezmoi owns config only: `CLAUDE.md`, `ENGINEERING.md`, `RTK.md`, `statusline.sh`, `skills/`,
-`agents/`, and `settings.json`. Session state (`projects/`, `history.jsonl`, `tasks`, `plans`) belongs to
+and `settings.json`. `agents/` belongs to the sous repo (see below). Session state (`projects/`, `history.jsonl`, `tasks`, `plans`) belongs to
 **claude-sync**; the two tools must never own the same path.
 
 `settings.json` is deployed by `modify_private_settings.json.tmpl` — a chezmoi **`modify_`
@@ -217,28 +217,36 @@ are stateful ledgers (absolute paths, timestamps, `gitCommitSha`) that Claude Co
 every plugin op; the declarative enabled-set lives in `settings.json` instead. Cost: a fresh
 machine needs a manual `/plugin` install pass.
 
-## Orchestrator and worker agents
+## sous and commis agents
 
-`dot_claude/agents/` deploys `orchestrator` and `worker` to `~/.claude/agents/`. Chris starts
-`avc --agent orchestrator`; it starts each worker as a full session in its own Herdr tab and
-worktree. An agent's body replaces Claude Code's default system prompt, while `CLAUDE.md`
-still loads, so the agent files must carry their own working instructions. The workflow rules
-live in `dot_claude/ENGINEERING.md`; their auto-mode copy is in
-`docs/claude-auto-mode-environment.md`, so change both together. Add specialist workers as
-new files once a role needs different instructions.
+The session agents come from the sous repo (`~/Projects/norman.me/sous`), not from here. Its
+`agents/` holds `sous` and `commis`, and `moon run agents:install` there symlinks them into
+`~/.claude/agents/`. Chris opens a repo with `sous open <project>`; the sous starts each
+commis with `sous start`, as a full session in its own Herdr tab and worktree. The dotfiles
+used to deploy `orchestrator` and `worker` agents from `dot_claude/agents/`; that source dir
+is gone, so chezmoi no longer manages `~/.claude/agents/` and never touches the symlinks. Do
+not add agent files back under `dot_claude/agents/`.
 
-Both agents may use subagents, but only the read-only `Explore` and `Plan` types. A
-`PreToolUse` hook on `Agent` in each file's frontmatter enforces this as an allowlist: it
-denies any other `subagent_type`, including `general-purpose`, `claude`, plugin agents, and
-forks (which carry no type). Two mechanisms that look right do not work:
+The workflow rules live in `dot_claude/ENGINEERING.md` (Version Control); their auto-mode
+copy is in `docs/claude-auto-mode-environment.md`, so change both together.
+
+`dot_config/sous/config.toml` is sous's global config (wrappers, harnesses, roles,
+worktree provider, projects, IDE). It holds no secrets. The absolute WebStorm Toolbox path
+under `[ide]` is intended.
+
+Subagent restriction, now carried by the sous repo's agent files: both agents may use only
+the read-only `Explore` and `Plan` subagent types. A `PreToolUse` hook on `Agent` in each
+file's frontmatter enforces this as an allowlist: it denies any other `subagent_type`,
+including `general-purpose`, `claude`, plugin agents, and forks (which carry no type). Two
+mechanisms that look right do not work:
 
 - `disallowedTools: Agent(x)` removes the **whole** `Agent` tool, not one type. That is why
-  the agents had no `Agent` tool at all when the field read `Agent(worker), Agent(orchestrator)`.
+  the old agents had no `Agent` tool at all when the field read `Agent(worker), Agent(orchestrator)`.
 - `tools: Agent(Explore, Plan)` is a real allowlist, but `tools` restricts the entire toolset,
   so every built-in and MCP server would have to be listed by hand.
 
 Claude Code skips frontmatter hooks for an agent whose file is in an untrusted folder. The
-deployed agents are user-scoped (`~/.claude/agents/`), so this only affects tests.
+installed agents are user-scoped (`~/.claude/agents/`), so this only affects tests.
 
 The `post-start` hook in `.config/wt.toml` opens WebStorm on each new worktree for review. It
 must be committed: a new worktree contains only committed files, so a staged hook never runs.
