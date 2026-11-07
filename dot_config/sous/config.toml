@@ -1,0 +1,70 @@
+# Chris's global sous configuration: the allowlist.
+
+# --- Wrappers ---------------------------------------------------------------
+
+[wrappers.vault]
+prefix    = ["agent-vault", "run", "--vault", "{vault}", "--"]
+# Detects a broker outage: verified with the broker host down, 2026-11-07.
+preflight = ["agent-vault", "account", "whoami"]
+
+[wrappers.vault.vars]
+vault = "claude"
+
+[wrappers.none]
+prefix = []
+
+# --- Harnesses --------------------------------------------------------------
+
+[harnesses.claude]
+kind     = "claude"
+command  = ["claude", "--agent", "{agent}", "-n", "{name}"]
+wrappers = ["vault"]
+
+# No agent-definition or session-name flag; `-p <profile>` is the nearest.
+[harnesses.codex]
+kind     = "codex"
+command  = ["codex"]
+wrappers = ["vault"]
+
+# Has `--agent`, but no agents are defined yet.
+[harnesses.agy]
+kind     = "agy"
+command  = ["agy"]
+wrappers = ["vault"]
+trust    = "agy"       # sous pre-trusts each new worktree for agy
+
+# --- Roles ------------------------------------------------------------------
+
+# commis and sous are the sous repo's agents/, symlinked by `moon run agents:install`.
+[roles.commis]
+harness = "claude"
+wrapper = "vault"
+agent   = "commis"
+
+[roles.sous]
+harness = "claude"
+wrapper = "vault"
+agent   = "sous"
+
+[roles.reviewer]
+harness = "codex"
+wrapper = "vault"
+agent   = "none"     # required; codex template has no {agent}
+
+[roles.taster]
+harness = "agy"
+wrapper = "vault"
+agent   = "none"     # required; agy template has no {agent}
+
+# --- Worktrees --------------------------------------------------------------
+
+[worktree]
+provider = "worktrunk"
+
+# --- Projects --------------------------------------------------------------
+
+[projects.sous]
+path = "~/Projects/norman.me/sous"
+
+[ide]
+command = ["/Users/cnorman/Library/Application Support/JetBrains/Toolbox/scripts/webstorm"]
