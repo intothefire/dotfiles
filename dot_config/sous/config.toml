@@ -25,6 +25,7 @@ wrappers = ["vault"]
 kind     = "codex"
 command  = ["codex"]
 wrappers = ["vault"]
+review   = ["codex", "exec", "--sandbox", "read-only", "{prompt}"]
 
 # Has `--agent`, but no agents are defined yet.
 [harnesses.agy]
@@ -32,6 +33,9 @@ kind     = "agy"
 command  = ["agy"]
 wrappers = ["vault"]
 trust    = "agy"       # sous pre-trusts each new worktree for agy
+review   = ["agy", "--mode", "plan",
+            "--settings", '{"permissions":{"allow":["command(git diff)","command(git log)","command(git show)","command(git status)","command(ls)","command(cat)","command(head)","command(tail)","command(wc)","command(pwd)"]}}',
+            "--print", "{prompt}"]
 
 # --- Roles ------------------------------------------------------------------
 
@@ -46,6 +50,11 @@ harness = "claude"
 wrapper = "vault"
 agent   = "sous"
 
+[roles.planner]
+harness = "claude"
+wrapper = "vault"
+agent   = "planner"
+
 [roles.reviewer]
 harness = "codex"
 wrapper = "vault"
@@ -55,6 +64,11 @@ agent   = "none"     # required; codex template has no {agent}
 harness = "agy"
 wrapper = "vault"
 agent   = "none"     # required; agy template has no {agent}
+
+# --- Review -----------------------------------------------------------------
+
+[review]
+reviewers = ["reviewer", "taster"]
 
 # --- Worktrees --------------------------------------------------------------
 
