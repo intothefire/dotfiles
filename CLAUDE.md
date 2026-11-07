@@ -232,7 +232,8 @@ copy is in `docs/claude-auto-mode-environment.md`, so change both together.
 
 `dot_config/sous/config.toml` is sous's global config (wrappers, harnesses, roles,
 worktree provider, projects, IDE). It holds no secrets. The absolute WebStorm Toolbox path
-under `[ide]` is intended.
+under `[ide]` is intended. It is workstation-only: `.chezmoiignore` skips `.config/sous` on
+`server` and `minimal`, the same as `.config/worktrunk`.
 
 Subagent restriction, now carried by the sous repo's agent files: both agents may use only
 the read-only `Explore` and `Plan` subagent types. A `PreToolUse` hook on `Agent` in each

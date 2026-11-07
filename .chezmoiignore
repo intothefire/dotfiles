@@ -30,4 +30,7 @@ docs
 # worktrunk is a workstation tool (parallel agent worktrees). These boxes don't get the
 # `wt` binary from the Brewfile, so the config would be inert clutter.
 .config/worktrunk
+# sous is a workstation tool too: it drives Herdr/worktrunk agent sessions, and its
+# [ide] command is a macOS-only JetBrains Toolbox path.
+.config/sous
 {{ end }}
