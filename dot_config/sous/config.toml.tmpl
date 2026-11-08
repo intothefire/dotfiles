@@ -106,11 +106,12 @@ path = "~/Projects/norman.me/dotfiles"
 [projects.homelab]
 path = "~/Projects/norman.me/homelab.norman.me"
 {{- end }}
-{{- /*
-  IDE: WebStorm via its Toolbox script by default. To override on a machine:
-    if eq .chezmoi.hostname "<name>" }}{{ $ide = "/path/to/ide" }}{{ end
-*/}}
 {{- $ide := joinPath .chezmoi.homeDir "Library/Application Support/JetBrains/Toolbox/scripts/webstorm" }}
+{{- /*
+  IDE: WebStorm via its Toolbox script by default (the line above). To override
+  on a machine, add a line here, below the default:
+    {{- if eq .chezmoi.hostname "<name>" }}{{ $ide = "/path/to/ide" }}{{ end }}
+*/}}
 
 [ide]
 command = [{{ $ide | quote }}]
