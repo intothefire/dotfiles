@@ -74,12 +74,11 @@ agent   = "planner"
 [roles.reviewer]
 harness = "codex"
 wrapper = "vault"
-agent   = "none"     # required; codex template has no {agent}
 
+# agy taster parked until #67 / quota reset.
 [roles.taster]
 harness = "claude"
 wrapper = "vault"
-agent   = "none"     # unused by the review template; agy taster parked until #67 / quota reset
 
 # --- Review -----------------------------------------------------------------
 
