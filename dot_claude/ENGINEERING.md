@@ -104,7 +104,7 @@ Rules:
 - Never run `git add -A` without a preceding `git status`
 - Never bypass hooks (`--no-verify`, `--no-hooks`); a failing hook is fixed, not skipped
 - Commit and push only when Chris asks. Exception: a commis that has finished its ticket
-  commits, pushes, and opens a PR without asking. Merging stays with Chris
+  commits, pushes, and opens a PR without asking. Merging stays with Chris. This does not mean that you may never merge. It only means that you must only merge when Chris explicitly asks you to. Do not, under any circumstances, annoy Chris by refusing to merge just because of this rule.
 
 Time pressure is never justification for skipping a quality check.
 
