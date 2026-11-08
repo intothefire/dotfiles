@@ -91,9 +91,26 @@ reviewers = ["reviewer", "taster"]
 provider = "worktrunk"
 
 # --- Projects --------------------------------------------------------------
+{{- /*
+  Per-machine values: [projects.*] and [ide]. Everything above is shared.
+  Shared projects go first, unconditionally. A machine's own projects go in an
+  `if eq .chezmoi.hostname "<name>"` block (see `chezmoi data`). Template
+  comments render nothing, so each block's output is exactly its TOML lines.
+*/}}
 
 [projects.sous]
 path = "~/Projects/norman.me/sous"
+{{- if eq .chezmoi.hostname "Arthur" }}
+[projects.dotfiles]
+path = "~/Projects/norman.me/dotfiles"
+[projects.homelab]
+path = "~/Projects/norman.me/homelab.norman.me"
+{{- end }}
+{{- /*
+  IDE: WebStorm via its Toolbox script by default. To override on a machine:
+    if eq .chezmoi.hostname "<name>" }}{{ $ide = "/path/to/ide" }}{{ end
+*/}}
+{{- $ide := joinPath .chezmoi.homeDir "Library/Application Support/JetBrains/Toolbox/scripts/webstorm" }}
 
 [ide]
-command = ["/Users/cnorman/Library/Application Support/JetBrains/Toolbox/scripts/webstorm"]
+command = [{{ $ide | quote }}]
