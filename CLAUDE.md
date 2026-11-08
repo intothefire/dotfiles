@@ -230,10 +230,27 @@ not add agent files back under `dot_claude/agents/`.
 The workflow rules live in `dot_claude/ENGINEERING.md` (Version Control); their auto-mode
 copy is in `docs/claude-auto-mode-environment.md`, so change both together.
 
-`dot_config/sous/config.toml` is sous's global config (wrappers, harnesses, roles,
-worktree provider, projects, IDE). It holds no secrets. The absolute WebStorm Toolbox path
-under `[ide]` is intended. It is workstation-only: `.chezmoiignore` skips `.config/sous` on
-`server` and `minimal`, the same as `.config/worktrunk`.
+`dot_config/sous/config.toml.tmpl` is sous's global config (wrappers, harnesses, roles,
+worktree provider, projects, IDE). It holds no secrets. It is workstation-only:
+`.chezmoiignore` skips `.config/sous` on `server` and `minimal`, the same as
+`.config/worktrunk`.
+
+It is a template only so `[projects.*]` and `[ide]` can differ per machine. Everything above
+the Projects section is shared and has no template actions. The braces in the agy
+`--settings` JSON and the `{agent}`/`{name}`/`{prompt}`/`{vault}` placeholders are single
+braces, so Go templates leave them alone. Keep it that way: a literal `{{` would start an action.
+
+- **Projects:** shared ones (`sous`) are unconditional. A machine's own projects go in an
+  `{{ if eq .chezmoi.hostname "<name>" }}` block; `chezmoi data` shows the hostname.
+  Arthur's block holds `dotfiles` and `homelab`.
+- **IDE:** `$ide` defaults to WebStorm's Toolbox script under `{{ .chezmoi.homeDir }}`.
+  Override it per machine with `{{ if eq .chezmoi.hostname "<name>" }}{{ $ide = "..." }}{{ end }}`
+  after the default is set.
+
+Any edit to the deployed `~/.config/sous/config.toml`, by hand or by a tool, is lost on the
+next apply unless it is added to that machine's block here. Check
+with `chezmoi diff ~/.config/sous/config.toml`, and render with
+`chezmoi execute-template < dot_config/sous/config.toml.tmpl`.
 
 Subagent restriction, now carried by the sous repo's agent files: both agents may use only
 the read-only `Explore` and `Plan` subagent types. A `PreToolUse` hook on `Agent` in each
