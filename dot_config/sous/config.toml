@@ -21,10 +21,16 @@ command  = ["claude", "--agent", "{agent}", "-n", "{name}"]
 wrappers = ["vault"]
 # Headless read-only review. `{prompt}` stays right after `-p`: --tools,
 # --allowedTools and --disallowedTools take lists, so a later positional would
-# be read as a tool name. The rtk forms are needed because the global rtk hook
-# rewrites `git log` to `rtk git log`. The deny list closes `--output=<file>`,
-# which git diff/log/show accept and which writes to any path; deny beats allow.
+# be read as a tool name.
+# --setting-sources "" loads no user, project or local settings. Without it the
+# user allow list (git rm/commit/push, gh pr merge) and the reviewed repo's own
+# .claude/settings*.json are unioned in, and dontAsk runs them: verified live.
+# It also drops the global rtk hook; the rtk forms stay allowed in case a hook
+# that rewrites `git log` to `rtk git log` is ever loaded here.
+# The deny list closes `--output=<file>`, which git diff/log/show accept and
+# which writes to any path; deny beats allow.
 review   = ["claude", "-p", "{prompt}", "--model", "sonnet",
+            "--setting-sources", "",
             "--tools", "Read,Grep,Glob,Bash",
             "--permission-mode", "dontAsk",
             "--allowedTools", "Read,Grep,Glob,Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(ls:*),Bash(rtk ls:*)",
