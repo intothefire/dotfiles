@@ -91,14 +91,6 @@ a security incident, not an inconvenience.
 Rules:
 - Conventional commits: concise, imperative, present tense
 - Work happens on branches; main is not a working branch
-- In a git repo, the sous plans and delegates. Chris opens it with `sous open <project>`.
-  Anything beyond planning and markdown planning documents is done by a commis, started with
-  `sous start` in its own worktree, branch, and Herdr tab, however small the change.
-  `agents/sous.md` in the sous repo (`~/Projects/norman.me/sous`) has the steps. This standing
-  rule is the explicit request for a new Herdr tab and worktree. Outside Herdr, Claude prints
-  the command for Chris to run
-- A commis runs under the configured launcher (Agent Vault for Chris), and never falls back
-  to plain `claude` when the broker is unreachable
 - Hook approvals belong to Chris: Claude never approves a worktrunk hook or passes `--yes`
   or `--no-hooks` to `wt`
 - Never run `git add -A` without a preceding `git status`
